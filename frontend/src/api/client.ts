@@ -1,0 +1,67 @@
+import type { Producto, Categoria, LoginResponse } from '@/types'
+
+const BASE = '/api'
+
+async function request<T>(url: string, options?: RequestInit): Promise<T> {
+  const res = await fetch(`${BASE}${url}`, {
+    headers: { 'Content-Type': 'application/json' },
+    ...options,
+  })
+  if (!res.ok) {
+    const err = await res.json().catch(() => ({ message: 'Error de red' }))
+    throw new Error(err.message || `HTTP ${res.status}`)
+  }
+  return res.json()
+}
+
+function authHeaders(token: string): Record<string, string> {
+  return { Authorization: `Bearer ${token}` }
+}
+
+export const api = {
+  login(email: string, password: string) {
+    return request<LoginResponse>('/auth/login', {
+      method: 'POST',
+      body: JSON.stringify({ email, password }),
+    })
+  },
+
+  getCategorias() {
+    return request<Categoria[]>('/categorias')
+  },
+
+  getProductos() {
+    return request<Producto[]>('/productos')
+  },
+
+  getProductosActivos() {
+    return request<Producto[]>('/productos/activos')
+  },
+
+  getProducto(id: number) {
+    return request<Producto>(`/productos/${id}`)
+  },
+
+  createProducto(data: Partial<Producto>, token: string) {
+    return request<Producto>('/productos', {
+      method: 'POST',
+      body: JSON.stringify(data),
+      headers: authHeaders(token),
+    })
+  },
+
+  updateProducto(id: number, data: Partial<Producto>, token: string) {
+    return request<Producto>(`/productos/${id}`, {
+      method: 'PATCH',
+      body: JSON.stringify(data),
+      headers: authHeaders(token),
+    })
+  },
+
+  deleteProducto(id: number, token: string) {
+    return request<{ success: boolean }>(`/productos/${id}`, {
+      method: 'DELETE',
+      headers: authHeaders(token),
+    })
+  },
+}
