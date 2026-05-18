@@ -1,9 +1,11 @@
-import { useState, useMemo } from 'react'
+import { useState, useMemo, useEffect } from 'react'
 import { useSearchParams } from 'react-router-dom'
 import { ProductCard } from '@/components/ProductCard'
 import { ProductCardSkeleton } from '@/components/ProductCardSkeleton'
 import { useProductosActivos, useCategorias } from '@/hooks/queries'
-import { Search, Filter, X } from 'lucide-react'
+import { Search, Filter, X, ChevronLeft, ChevronRight } from 'lucide-react'
+
+const ITEMS_PER_PAGE = 24
 
 export function ProductosPage() {
   const [searchParams, setSearchParams] = useSearchParams()
@@ -14,6 +16,7 @@ export function ProductosPage() {
     searchParams.get('categoria') ? [searchParams.get('categoria')!] : []
   )
   const [mostrarFiltros, setMostrarFiltros] = useState(false)
+  const [pagina, setPagina] = useState(1)
 
   const productosFiltrados = useMemo(() => {
     return productos.filter((producto) => {
@@ -33,6 +36,14 @@ export function ProductosPage() {
     })
   }, [busqueda, categoriasSeleccionadas, productos])
 
+  const totalPaginas = Math.max(1, Math.ceil(productosFiltrados.length / ITEMS_PER_PAGE))
+  const inicio = (pagina - 1) * ITEMS_PER_PAGE
+  const productosPagina = productosFiltrados.slice(inicio, inicio + ITEMS_PER_PAGE)
+
+  useEffect(() => {
+    setPagina(1)
+  }, [busqueda, categoriasSeleccionadas])
+
   const toggleCategoria = (slug: string) => {
     setCategoriasSeleccionadas((prev) =>
       prev.includes(slug) ? prev.filter((c) => c !== slug) : [...prev, slug]
@@ -46,6 +57,61 @@ export function ProductosPage() {
   }
 
   const filtrosActivos = categoriasSeleccionadas.length
+
+  function Paginacion() {
+    if (totalPaginas <= 1) return null
+    const paginas: number[] = []
+    const maxVisibles = 5
+    let desde = Math.max(1, pagina - Math.floor(maxVisibles / 2))
+    let hasta = Math.min(totalPaginas, desde + maxVisibles - 1)
+    if (hasta - desde + 1 < maxVisibles) desde = Math.max(1, hasta - maxVisibles + 1)
+
+    for (let i = desde; i <= hasta; i++) paginas.push(i)
+
+    return (
+      <div className="flex items-center justify-center gap-2 mt-12">
+        <button
+          onClick={() => setPagina(p => Math.max(1, p - 1))}
+          disabled={pagina === 1}
+          className="w-10 h-10 rounded-lg flex items-center justify-center text-gray-400 hover:text-white hover:bg-gray-800 disabled:opacity-30 disabled:cursor-not-allowed transition-all"
+        >
+          <ChevronLeft className="w-5 h-5" />
+        </button>
+        {desde > 1 && (
+          <>
+            <button onClick={() => setPagina(1)} className="w-10 h-10 rounded-lg text-gray-400 hover:text-white hover:bg-gray-800 transition-all text-sm">1</button>
+            {desde > 2 && <span className="text-gray-600">...</span>}
+          </>
+        )}
+        {paginas.map(p => (
+          <button
+            key={p}
+            onClick={() => setPagina(p)}
+            className={`w-10 h-10 rounded-lg text-sm font-medium transition-all ${
+              p === pagina
+                ? 'bg-gradient-to-r from-cyan-500 to-purple-600 text-white shadow-lg shadow-cyan-500/30'
+                : 'text-gray-400 hover:text-white hover:bg-gray-800'
+            }`}
+          >
+            {p}
+          </button>
+        ))}
+        {hasta < totalPaginas && (
+          <>
+            {hasta < totalPaginas - 1 && <span className="text-gray-600">...</span>}
+            <button onClick={() => setPagina(totalPaginas)} className="w-10 h-10 rounded-lg text-gray-400 hover:text-white hover:bg-gray-800 transition-all text-sm">{totalPaginas}</button>
+          </>
+        )}
+        <button
+          onClick={() => setPagina(p => Math.min(totalPaginas, p + 1))}
+          disabled={pagina === totalPaginas}
+          className="w-10 h-10 rounded-lg flex items-center justify-center text-gray-400 hover:text-white hover:bg-gray-800 disabled:opacity-30 disabled:cursor-not-allowed transition-all"
+        >
+          <ChevronRight className="w-5 h-5" />
+        </button>
+      </div>
+    )
+  }
 
   return (
     <div className="min-h-screen bg-black pt-20">
@@ -115,6 +181,11 @@ export function ProductosPage() {
           <p className="text-gray-400">
             Mostrando <span className="text-cyan-400 font-semibold">{productosFiltrados.length}</span>{' '}
             {productosFiltrados.length === 1 ? 'producto' : 'productos'}
+            {totalPaginas > 1 && (
+              <span className="text-gray-600">
+                {' '}— Página {pagina} de {totalPaginas}
+              </span>
+            )}
           </p>
         </div>
 
@@ -125,11 +196,14 @@ export function ProductosPage() {
             ))}
           </div>
         ) : productosFiltrados.length > 0 ? (
-          <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 xl:grid-cols-4 gap-6">
-            {productosFiltrados.map((producto) => (
-              <ProductCard key={producto.id} producto={producto} />
-            ))}
-          </div>
+          <>
+            <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 xl:grid-cols-4 gap-6">
+              {productosPagina.map((producto) => (
+                <ProductCard key={producto.id} producto={producto} />
+              ))}
+            </div>
+            <Paginacion />
+          </>
         ) : (
           <div className="text-center py-20">
             <div className="mb-4 text-gray-600"><Search className="w-16 h-16 mx-auto" /></div>
