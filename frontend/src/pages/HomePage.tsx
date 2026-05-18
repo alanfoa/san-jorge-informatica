@@ -1,11 +1,12 @@
 import { Link } from 'react-router-dom'
 import { ProductCard } from '@/components/ProductCard'
+import { ProductCardSkeleton } from '@/components/ProductCardSkeleton'
 import { useProductosActivos } from '@/hooks/queries'
 import { Cpu, HardDrive, MonitorPlay, Gamepad2, Search, MessageCircle, Truck, Zap } from 'lucide-react'
 import { WHATSAPP } from '@/lib/constants'
 
 export function HomePage() {
-  const { data: productos = [] } = useProductosActivos()
+  const { data: productos = [], isLoading } = useProductosActivos()
 
   const iconosCategoria: Record<string, React.ReactNode> = {
     'Placas de Video': <MonitorPlay className="w-8 h-8" />,
@@ -139,9 +140,11 @@ export function HomePage() {
           </div>
 
           <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 xl:grid-cols-4 gap-6">
-            {productosMostrados.map((producto) => (
-              <ProductCard key={producto.id} producto={producto} />
-            ))}
+            {isLoading
+              ? Array.from({ length: 4 }).map((_, i) => <ProductCardSkeleton key={i} />)
+              : productosMostrados.map((producto) => (
+                  <ProductCard key={producto.id} producto={producto} />
+                ))}
           </div>
 
           <div className="text-center mt-12">

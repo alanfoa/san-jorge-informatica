@@ -1,12 +1,13 @@
 import { useState, useMemo } from 'react'
 import { useSearchParams } from 'react-router-dom'
 import { ProductCard } from '@/components/ProductCard'
+import { ProductCardSkeleton } from '@/components/ProductCardSkeleton'
 import { useProductosActivos, useCategorias } from '@/hooks/queries'
 import { Search, Filter, X } from 'lucide-react'
 
 export function ProductosPage() {
   const [searchParams, setSearchParams] = useSearchParams()
-  const { data: productos = [] } = useProductosActivos()
+  const { data: productos = [], isLoading } = useProductosActivos()
   const { data: categorias = [] } = useCategorias()
   const [busqueda, setBusqueda] = useState('')
   const [categoriasSeleccionadas, setCategoriasSeleccionadas] = useState<string[]>(
@@ -117,7 +118,13 @@ export function ProductosPage() {
           </p>
         </div>
 
-        {productosFiltrados.length > 0 ? (
+        {isLoading ? (
+          <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 xl:grid-cols-4 gap-6">
+            {Array.from({ length: 8 }).map((_, i) => (
+              <ProductCardSkeleton key={i} />
+            ))}
+          </div>
+        ) : productosFiltrados.length > 0 ? (
           <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 xl:grid-cols-4 gap-6">
             {productosFiltrados.map((producto) => (
               <ProductCard key={producto.id} producto={producto} />

@@ -3,9 +3,7 @@ import { MulterModule } from "@nestjs/platform-express";
 import { UploadController } from "./upload.controller.js";
 
 @Module({
-  imports: [
-    MulterModule.register({ dest: "./uploads" }),
-  ],
+  imports: [MulterModule.register({ dest: "./uploads" })],
   controllers: [UploadController],
 })
 export class UploadModule {}

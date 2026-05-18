@@ -1,6 +1,6 @@
 import { useQuery, useMutation, useQueryClient } from '@tanstack/react-query'
 import { api } from '@/api/client'
-import type { Producto } from '@/types'
+import type { Producto, Categoria } from '@/types'
 import { useNavigate } from 'react-router-dom'
 
 export function useCategorias() {
@@ -38,10 +38,13 @@ export function useProducto(id: number | undefined) {
 export function useLogin() {
   const navigate = useNavigate()
   return useMutation({
-    mutationFn: ({ email, password }: { email: string; password: string }) =>
-      api.login(email, password),
-    onSuccess: (res) => {
-      localStorage.setItem('admin_token', res.access_token)
+    mutationFn: ({ email, password, remember }: { email: string; password: string; remember?: boolean }) =>
+      api.login(email, password).then(res => {
+        const storage = remember !== false ? localStorage : sessionStorage
+        storage.setItem('admin_token', res.access_token)
+        return res
+      }),
+    onSuccess: () => {
       navigate('/admin')
     },
   })
@@ -81,6 +84,39 @@ export function useDeleteProducto() {
       api.deleteProducto(id, token),
     onSuccess: () => {
       queryClient.invalidateQueries({ queryKey: ['productos'] })
+    },
+  })
+}
+
+export function useCreateCategoria() {
+  const queryClient = useQueryClient()
+  return useMutation({
+    mutationFn: ({ data, token }: { data: Partial<Categoria>; token: string }) =>
+      api.createCategoria(data, token),
+    onSuccess: () => {
+      queryClient.invalidateQueries({ queryKey: ['categorias'] })
+    },
+  })
+}
+
+export function useUpdateCategoria() {
+  const queryClient = useQueryClient()
+  return useMutation({
+    mutationFn: ({ id, data, token }: { id: number; data: Partial<Categoria>; token: string }) =>
+      api.updateCategoria(id, data, token),
+    onSuccess: () => {
+      queryClient.invalidateQueries({ queryKey: ['categorias'] })
+    },
+  })
+}
+
+export function useDeleteCategoria() {
+  const queryClient = useQueryClient()
+  return useMutation({
+    mutationFn: ({ id, token }: { id: number; token: string }) =>
+      api.deleteCategoria(id, token),
+    onSuccess: () => {
+      queryClient.invalidateQueries({ queryKey: ['categorias'] })
     },
   })
 }

@@ -1,15 +1,28 @@
 import "reflect-metadata";
 import { NestFactory } from "@nestjs/core";
 import { ValidationPipe } from "@nestjs/common";
+import { NestExpressApplication } from "@nestjs/platform-express";
+import { join } from "path";
+import { fileURLToPath } from "url";
 import { AppModule } from "./app.module.js";
 
+const __dirname = fileURLToPath(new URL(".", import.meta.url));
+
 async function bootstrap() {
-  const app = await NestFactory.create(AppModule);
+  const app = await NestFactory.create<NestExpressApplication>(AppModule);
 
   app.setGlobalPrefix("api");
   app.enableCors({
-    origin: ["http://localhost:5173", "http://localhost:4173"],
+    origin: [
+      "http://localhost:5173",
+      "http://localhost:4173",
+      ...(process.env.CORS_ORIGIN ? process.env.CORS_ORIGIN.split(",") : []),
+    ],
     credentials: true,
+  });
+
+  app.useStaticAssets(join(__dirname, "..", "uploads"), {
+    prefix: "/uploads",
   });
 
   app.useGlobalPipes(new ValidationPipe({ transform: true, whitelist: true }));

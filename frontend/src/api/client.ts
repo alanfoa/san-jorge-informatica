@@ -1,11 +1,14 @@
 import type { Producto, Categoria, LoginResponse } from '@/types'
 
-const BASE = '/api'
+const BASE = import.meta.env.VITE_API_URL ?? '/api'
 
 async function request<T>(url: string, options?: RequestInit): Promise<T> {
   const res = await fetch(`${BASE}${url}`, {
-    headers: { 'Content-Type': 'application/json' },
     ...options,
+    headers: {
+      'Content-Type': 'application/json',
+      ...(options?.headers as Record<string, string>),
+    },
   })
   if (!res.ok) {
     const err = await res.json().catch(() => ({ message: 'Error de red' }))
@@ -63,5 +66,43 @@ export const api = {
       method: 'DELETE',
       headers: authHeaders(token),
     })
+  },
+
+  createCategoria(data: Partial<Categoria>, token: string) {
+    return request<Categoria>('/categorias', {
+      method: 'POST',
+      body: JSON.stringify(data),
+      headers: authHeaders(token),
+    })
+  },
+
+  updateCategoria(id: number, data: Partial<Categoria>, token: string) {
+    return request<Categoria>(`/categorias/${id}`, {
+      method: 'PATCH',
+      body: JSON.stringify(data),
+      headers: authHeaders(token),
+    })
+  },
+
+  deleteCategoria(id: number, token: string) {
+    return request<{ success: boolean }>(`/categorias/${id}`, {
+      method: 'DELETE',
+      headers: authHeaders(token),
+    })
+  },
+
+  async uploadFile(file: File, token: string) {
+    const form = new FormData()
+    form.append('file', file)
+    const res = await fetch(`${BASE}/upload`, {
+      method: 'POST',
+      headers: authHeaders(token),
+      body: form,
+    })
+    if (!res.ok) {
+      const err = await res.json().catch(() => ({ message: 'Error al subir imagen' }))
+      throw new Error(err.message || `HTTP ${res.status}`)
+    }
+    return res.json() as Promise<{ url: string }>
   },
 }

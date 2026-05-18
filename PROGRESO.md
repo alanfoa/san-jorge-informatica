@@ -14,38 +14,45 @@
 - [x] Crear `frontend/src/hooks/queries.ts` con hooks tipados
 - [x] Reemplazar todo `useEffect` + `useState` crudo por hooks React Query en cada página
 
-### Objetivo 2: Skeleton + Loading States ⬜
-- [ ] Crear `ProductCardSkeleton.tsx` (animate-pulse)
-- [ ] Crear `DetailSkeleton.tsx` (para ProductoPage)
-- [ ] Crear `TableSkeleton.tsx` (para AdminPage)
-- [ ] Integrar `isLoading` / `isFetching` en todas las páginas
+### Objetivo 2: Skeleton + Loading States ✅
+- [x] Crear `ProductCardSkeleton.tsx` (animate-pulse)
+- [x] Crear `DetailSkeleton.tsx` (para ProductoPage)
+- [x] Crear `TableSkeleton.tsx` (para AdminPage)
+- [x] Integrar `isLoading` / `isFetching` en todas las páginas
 
-### Objetivo 3: Admin Categorías ⬜
-- [ ] Crear página `AdminCategoriasPage.tsx` (tabla + CRUD)
-- [ ] Agregar ruta `/admin/categorias` en App.tsx
-- [ ] Agregar link en AdminPage
+### Objetivo 3: Admin Categorías ✅
+- [x] Crear página `AdminCategoriasPage.tsx` (tabla + CRUD modal)
+- [x] Agregar ruta `/admin/categorias` en App.tsx
+- [x] Agregar link en AdminPage
 
-### Objetivo 4: Backend — Perfil + Upload ⬜
-- [ ] Implementar `GET /auth/perfil` + CurrentUser decorator
-- [ ] Conectar file upload en ProductForm (usar endpoint `/upload`)
+### Objetivo 4: Backend — Perfil + Upload ✅
+- [x] Implementar `GET /auth/perfil` + CurrentUser decorator
+- [x] File upload en ProductForm (input file + endpoint /upload)
+- [x] ServeStaticModule para servir uploads/ en producción
 
-### Objetivo 5: Deploy ⬜
-- [ ] Backend: crear `tsconfig.build.json`, probar `npm run build` + `start:prod`
-- [ ] Frontend: build final, ajustar variables de entorno
+### Objetivo 5: Deploy ✅ (config listo, falta subir)
+- [x] Backend: `tsconfig.build.json` creado, `npm run build` + `start:prod` funcionando
+- [x] Frontend: build final, `VITE_API_URL` variable de entorno
+- [x] `netlify.toml` con build + SPA redirects
+- [x] `.env.example` actualizado con CORS_ORIGIN
 - [ ] Subir a Render + Netlify
 
-### Objetivo 6: Admin para tu papá (UX no-técnico) ⬜
-- [ ] File upload directo en ProductForm (seleccionar imagen del celular/PC)
-- [ ] Labels grandes, placeholders claros, todo en español
-- [ ] Login persistente (que no pida contraseña cada vez)
-- [ ] Mobile-friendly (que funcione bien desde el celular)
-- [ ] Toast notifications en vez de `alert()` para feedback claro
+### Objetivo 6: Admin para tu papá (UX no-técnico) ✅
+- [x] File upload directo en ProductForm (subir archivo + preview)
+- [x] Labels grandes, placeholders claros, todo en español
+- [x] Login persistente con "Recordar sesión" checkbox (localStorage/sessionStorage)
+- [x] Mobile-friendly (overflow-x-auto en tablas, responsive)
+- [x] Toast notifications (componente `<Toast />` reemplaza todos los `alert()`)
+- [x] Stock field visible en formulario
 - [ ] Probar el flujo completo con él: login → tabla → crear/editar/eliminar
 
-### Extras si sobra tiempo ⬜
-- [ ] Scroll suave en anchor links (`/#categorias`, `/#como-comprar`)
-- [ ] `.env.example`
+### Extras si sobra tiempo ⬜ (en progreso)
+- [x] Scroll suave vía CSS (`scroll-behavior: smooth`)
+- [x] `.env.example` actualizado
 - [ ] End-to-end testing
+- [x] Custom 404 page
+- [x] Galería de imágenes en ProductoPage
+- [x] Admin: filtrar productos por categoría
 
 ---
 
@@ -76,7 +83,7 @@
 - ✅ JwtStrategy con validación de usuario activo
 - ✅ JwtAuthGuard + RolesGuard + Roles decorator (`@Roles("admin", "editor")`)
 - ✅ Testeado: `POST /api/auth/login` devuelve `access_token` + `user`
-- ❌ **`GET /auth/perfil`** — endpoint listado en PLAN pero no implementado
+- ✅ **`GET /auth/perfil`** — endpoint implementado con JwtAuthGuard + CurrentUser
 
 ### 1.4 CRUDs
 - ✅ **Users**: POST/GET/GET:id/PATCH:id/DELETE:id (solo admin)
@@ -97,7 +104,7 @@
 ### 2.1 Base
 - ✅ Vite 8 + React 19 + TypeScript 6
 - ✅ Tailwind CSS 4 + `@tailwindcss/vite`
-- ✅ React Router v7 (rutas: `/`, `/productos`, `/productos/:id`, `/admin/login`, `/admin`, `/admin/nuevo`, `/admin/editar/:id`)
+- ✅ React Router v7 (rutas: `/`, `/productos`, `/productos/:id`, `/admin/login`, `/admin`, `/admin/categorias`, `/admin/nuevo`, `/admin/editar/:id`)
 - ✅ Vite proxy: `/api` → `localhost:3001`
 - ✅ `tsc --noEmit` → 0 errores, `vite build` exitoso
 
@@ -118,6 +125,7 @@
 ### 2.4 API Client (`src/api/client.ts`)
 - ✅ `login()`, `getCategorias()`, `getProductos()`, `getProductosActivos()`, `getProducto()`
 - ✅ `createProducto()`, `updateProducto()`, `deleteProducto()` (con token)
+- ✅ `createCategoria()`, `updateCategoria()`, `deleteCategoria()` (con token)
 
 ### 2.5 Pendientes Frontend
 - ✅ **@tanstack/react-query** — instalado y configurado
@@ -125,17 +133,25 @@
   - `useProductos()`, `useProducto(id)`, `useCategorias()`
   - `useCreateProducto()`, `useUpdateProducto()`, `useDeleteProducto()`
   - `useLogin()`
-- ❌ **Skeleton loading** — no hay componentes de carga (skeleton cards, detail skeleton, table skeleton)
-- ❌ **Loading states** — páginas no tienen spinner/loading mientras fetch
-- ❌ **Admin CRUD para categorías** — solo productos, faltan categorías en admin
-- ❌ **ProductForm** — no maneja subida de imágenes (upload endpoint existe pero no conectado)
-- ❌ **Manejo de errores** — sin toast/notificaciones, solo alert() en admin
-- ❌ **UX para usuario no técnico** (tu papá):
-  - File upload directo en vez de solo URL
-  - Labels/placeholders ultra claros en español
-  - Login persistente
-  - Mobile-friendly
-  - Feedback visual con toast en vez de alert()
+  - `useCreateCategoria()`, `useUpdateCategoria()`, `useDeleteCategoria()`
+- ✅ **Skeleton loading** — ProductCardSkeleton, DetailSkeleton, TableSkeleton creados con animate-pulse
+- ✅ **Loading states** — todas las páginas integran isLoading con skeletons
+- ✅ **Admin CRUD para categorías** — AdminCategoriasPage con tabla + modal inline para crear/editar/eliminar
+- ✅ **ProductForm** — file upload directo + URL manual + preview de imagen + stock field
+- ✅ **Fix: Content-Type en client.ts** — merge de headers corregido, ahora POST/PATCH envía correctamente `Content-Type: application/json`
+- ✅ **Fix: @UseGuards en UsersController** — agregado `@UseGuards(JwtAuthGuard, RolesGuard)` a nivel clase
+- ✅ **Fix: stock en ProductForm** — `stock` incluido en el submit
+- ✅ **Fix: RolesGuard Reflector bug** — `RolesGuard` usaba `Reflector` vía DI (no disponible en ESM), reemplazado por `Reflect.getMetadata` directo. Sin esto POST/PATCH/DELETE daban 500
+- ✅ **Toast notifications** — componente `<Toast />` con contexto reemplaza todos los `alert()`
+- ✅ **Login persistente** — checkbox "Recordar sesión" (localStorage) o sessionStorage
+- ✅ **AdminRoute** — wrapper con `Navigate` que redirige a `/admin/login` si no hay token, protege todas las rutas `admin/*`
+- ✅ **UX para usuario no técnico** (tu papá):
+  - File upload directo (input file + preview) y URL manual
+  - Labels grandes, placeholders claros, todo en español
+  - Login persistente con "Recordar sesión"
+  - Mobile-friendly (overflow-auto en tablas)
+  - Toast en vez de alert()
+  - Stock field visible
 
 ---
 
@@ -155,10 +171,14 @@
 
 ## 4. Deploy
 
-- ❌ **Render (Backend)**: No configurado. Build: `npm install && npm run build`, Start: `node dist/main.js`
-- ❌ **Netlify (Frontend)**: No configurado. Build: `npm run build` → `dist/`, Redirects: SPA
-- ❌ Variables de producción: JWT_SECRET seguro, PORT dinámico
-- ❌ `.env.example` no creado
+- ✅ **Backend build**: `tsconfig.build.json` + `tsc -p tsconfig.build.json` → `dist/`, `start:prod` probado y funcionando
+- ✅ **Frontend build**: `npm run build` → `dist/`, variable `VITE_API_URL` para producción
+- ✅ **netlify.toml**: build command + SPA redirects configurado
+- ✅ **ServeStaticModule**: backend sirve `uploads/` como `/uploads/` en producción
+- ✅ **CORS**: configurable via `CORS_ORIGIN` env var
+- ✅ **.env.example**: actualizado con JWT_SECRET, PORT, CORS_ORIGIN
+- ❌ **Render (Backend)**: No subido aún
+- ❌ **Netlify (Frontend)**: No subido aún
 
 ---
 
@@ -170,14 +190,15 @@
 | Auth | ██████████ 100% |
 | CRUDs | ██████████ 100% |
 | Seed | ██████████ 100% |
-| Frontend Páginas | █████████░ 90% |
-| Admin UX (no-técnico) | ░░░░░░░░░░ 0% |
+| Frontend Páginas | ██████████ 100% |
+| Admin UX (no-técnico) | ██████████ 100% |
 | React Query | ██████████ 100% |
-| Skeleton/Loading | ░░░░░░░░░░ 0% |
-| Admin Categorías | ░░░░░░░░░░ 0% |
-| Deploy | ░░░░░░░░░░ 0% |
-| **Total** | **~53%** |
+| Skeleton/Loading | ██████████ 100% |
+| Admin Categorías | ██████████ 100% |
+| Galería + 404 + extras | ██████████ 100% |
+| Deploy | ████████░░ 80% (config listo, falta subir) |
+| **Total** | **~92%** |
 
 ---
 
-> _Última actualización: 18/05/2026_
+> _Última actualización: 18/05/2026 — +FileUpload+Stock+Preview ProductForm, +Toast system, +Login persistente, +Smooth scroll CSS, +tsconfig.build.json+start:prod, +netlify.toml, +VITE_API_URL, +NotFoundPage, +Galería imágenes ProductoPage, +Admin filtrar por categoría, +.env.example, +Circular deps entities fix ESM_
