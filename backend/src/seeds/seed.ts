@@ -12,7 +12,7 @@ async function seed() {
     location: join(__dirname, "..", "..", "data.db"),
     autoSave: true,
     synchronize: true,
-    entities: [join(__dirname, "..", "**", "*.entity.js")],
+    entities: [join(__dirname, "..", "**", "*.entity.{ts,js}")],
   });
 
   await ds.initialize();
