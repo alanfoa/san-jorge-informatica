@@ -1,42 +1,54 @@
 import {
-  Controller, Post, UseInterceptors, UploadedFile, UseGuards, BadRequestException,
+  Controller, Post, UseInterceptors, UploadedFile, UseGuards, BadRequestException, Inject,
 } from "@nestjs/common";
 import { FileInterceptor } from "@nestjs/platform-express";
-import { diskStorage } from "multer";
-import { extname, join } from "path";
-import { fileURLToPath } from "url";
+import { v2 as cloudinary } from 'cloudinary';
 import { JwtAuthGuard } from "../../common/guards/jwt-auth.guard.js";
 import { RolesGuard } from "../../common/guards/roles.guard.js";
 import { Roles } from "../../common/guards/roles.decorator.js";
-
-const __dirname = fileURLToPath(new URL(".", import.meta.url));
+import { CLOUDINARY } from "../../cloudinary/constants.js";
+import { unlink } from "fs/promises"; // Para eliminar el archivo temporal de multer
 
 @Controller("upload")
 @UseGuards(JwtAuthGuard, RolesGuard)
 @Roles("admin", "editor")
 export class UploadController {
+  constructor(@Inject(CLOUDINARY) private cloudinaryService: typeof cloudinary) {}
+
   @Post()
   @UseInterceptors(
     FileInterceptor("file", {
-      storage: diskStorage({
-        destination: join(__dirname, "..", "..", "..", "uploads"),
-        filename: (_req, file, cb) => {
-          const name = `${Date.now()}-${Math.round(Math.random() * 1e9)}`;
-          cb(null, `${name}${extname(file.originalname)}`);
-        },
-      }),
-      limits: { fileSize: 5 * 1024 * 1024 },
+      limits: { fileSize: 5 * 1024 * 1024 }, // Limite de 5MB
       fileFilter: (_req, file, cb) => {
         if (!file.mimetype.match(/^image\//)) {
-          cb(new BadRequestException("Solo imágenes"), false);
+          cb(new BadRequestException("Solo se permiten archivos de imagen"), false);
           return;
         }
         cb(null, true);
       },
     })
   )
-  uploadFile(@UploadedFile() file: Express.Multer.File) {
-    if (!file) throw new BadRequestException("Archivo requerido");
-    return { url: `/uploads/${file.filename}` };
+  async uploadFile(@UploadedFile() file: Express.Multer.File) {
+    if (!file) {
+      throw new BadRequestException("Archivo requerido");
+    }
+
+    try {
+      // Subir el archivo a Cloudinary
+      const result = await this.cloudinaryService.uploader.upload(file.path, {
+        folder: 'sanjorge-informatica', // Carpeta en Cloudinary
+      });
+
+      // Eliminar el archivo temporal de multer después de subirlo a Cloudinary
+      await unlink(file.path);
+
+      return { url: result.secure_url };
+    } catch (error) {
+      // Si hay un error, intentar eliminar el archivo temporal
+      if (file.path) {
+        await unlink(file.path).catch(e => console.error("Error al eliminar archivo temporal:", e));
+      }
+      throw new BadRequestException("Error al subir la imagen a Cloudinary");
+    }
   }
 }
