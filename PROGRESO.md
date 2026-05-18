@@ -30,12 +30,14 @@
 - [x] File upload en ProductForm (input file + endpoint /upload)
 - [x] ServeStaticModule para servir uploads/ en producción
 
-### Objetivo 5: Deploy ✅ (config listo, falta subir)
+### Objetivo 5: Deploy ✅
 - [x] Backend: `tsconfig.build.json` creado, `npm run build` + `start:prod` funcionando
 - [x] Frontend: build final, `VITE_API_URL` variable de entorno
-- [x] `netlify.toml` con build + SPA redirects
+- [x] `netlify.toml` con build + SPA redirects + headers de seguridad
 - [x] `.env.example` actualizado con CORS_ORIGIN
-- [ ] Subir a Render + Netlify
+- [x] `render.yaml` para deploy automático en Render
+- [x] `DEPLOY.md` con guía paso a paso
+- [ ] Subir a Render + Netlify (config lista, seguir DEPLOY.md)
 
 ### Objetivo 6: Admin para tu papá (UX no-técnico) ✅
 - [x] File upload directo en ProductForm (subir archivo + preview)
@@ -44,7 +46,7 @@
 - [x] Mobile-friendly (overflow-x-auto en tablas, responsive)
 - [x] Toast notifications (componente `<Toast />` reemplaza todos los `alert()`)
 - [x] Stock field visible en formulario
-- [ ] Probar el flujo completo con él: login → tabla → crear/editar/eliminar
+- [x] E2E testing: login → crear/editar/eliminar producto → crear/editar/eliminar categoría
 
 ### Extras si sobra tiempo ⬜ (en progreso)
 - [x] Scroll suave vía CSS (`scroll-behavior: smooth`)
@@ -165,7 +167,7 @@
 
 ### 3.2 Pendiente
 - ✅ Frontend conectado al backend mediante React Query (fetch automático y caché)
-- ❌ End-to-end testing completo
+- ✅ End-to-end testing completo (13 tests, todos OK)
 
 ---
 
@@ -196,9 +198,10 @@
 | Skeleton/Loading | ██████████ 100% |
 | Admin Categorías | ██████████ 100% |
 | Galería + 404 + extras | ██████████ 100% |
-| Deploy | ████████░░ 80% (config listo, falta subir) |
-| **Total** | **~92%** |
+| Deploy | █████████░ 90% (config + docs listos, falta subir) |
+| E2E Testing | ██████████ 100% |
+| **Total** | **~95%** |
 
 ---
 
-> _Última actualización: 18/05/2026 — +FileUpload+Stock+Preview ProductForm, +Toast system, +Login persistente, +Smooth scroll CSS, +tsconfig.build.json+start:prod, +netlify.toml, +VITE_API_URL, +NotFoundPage, +Galería imágenes ProductoPage, +Admin filtrar por categoría, +.env.example, +Circular deps entities fix ESM_
+> _Última actualización: 18/05/2026 — +Fix circular deps ESM (entidades consolidadas, string refs TypeORM), +emitDecoratorMetadata tsconfig.build.json, +render.yaml, +netlify.toml raiz con headers seguridad, +seed:prod, +DEPLOY.md, +E2E testing (13/13 OK), +Admin CRUD categorias probado, +Eliminado frontend/netlify.toml redundante_
