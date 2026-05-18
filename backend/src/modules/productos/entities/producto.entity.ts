@@ -14,6 +14,9 @@ export class Producto {
   @Column("text", { nullable: true })
   descripcion: string;
 
+  @Column("varchar", { unique: true, nullable: true })
+  sku: string;
+
   @Column("decimal", { precision: 10, scale: 2 })
   precio: number;
 

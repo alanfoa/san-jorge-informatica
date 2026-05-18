@@ -28,6 +28,10 @@ export class CreateProductoDto {
   @IsString()
   descripcion?: string;
 
+  @IsOptional()
+  @IsString()
+  sku?: string;
+
   @IsNumber()
   @Min(0)
   precio: number;
