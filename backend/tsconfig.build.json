@@ -13,7 +13,8 @@
     "resolveJsonModule": true,
     "declaration": false,
     "sourceMap": false,
-    "experimentalDecorators": true
+    "experimentalDecorators": true,
+    "emitDecoratorMetadata": true
   },
   "include": ["src/**/*.ts"],
   "exclude": ["node_modules", "dist"]

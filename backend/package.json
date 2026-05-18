@@ -8,6 +8,7 @@
     "build": "tsc -p tsconfig.build.json",
     "start:prod": "node dist/main.js",
     "seed": "tsx src/seeds/seed.ts",
+    "seed:prod": "node dist/seeds/seed.js",
     "typeorm": "typeorm-ts-node-commonjs",
     "migration:run": "tsx src/database/data-source.ts run",
     "migration:generate": "tsx src/database/data-source.ts generate",
