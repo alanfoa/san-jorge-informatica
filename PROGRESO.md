@@ -95,74 +95,15 @@
 
 ### 1.5 Seed
 - ✅ 2 usuarios: admin@sanjorge.com / admin123 (admin), editor@sanjorge.com / editor123 (editor)
-- ✅ 9 categorías
-- ✅ 16 productos con características técnicas
+- ✅ 9 categorías base (seed manual)
+- ✅ 16 productos con características técnicas (seed manual)
 - ✅ Script `npm run seed` funcionando
-
----
-
-## 2. Frontend — React 19 + Vite + Tailwind 4 + React Router v7
-
-### 2.1 Base
-- ✅ Vite 8 + React 19 + TypeScript 6
-- ✅ Tailwind CSS 4 + `@tailwindcss/vite`
-- ✅ React Router v7 (rutas: `/`, `/productos`, `/productos/:id`, `/admin/login`, `/admin`, `/admin/categorias`, `/admin/nuevo`, `/admin/editar/:id`)
-- ✅ Vite proxy: `/api` → `localhost:3001`
-- ✅ `tsc --noEmit` → 0 errores, `vite build` exitoso
-
-### 2.2 Componentes
-- ✅ **Navbar**: Logo, links (Inicio, Catálogo, Categorías, Cómo Comprar), menú mobile, smooth scroll al navegar
-- ✅ **Footer**
-- ✅ **ProductCard**: Card con gradiente, hover effects, badge categoría, botón WhatsApp
-- ✅ **ProductForm**: Formulario con campos nombre, descripción, precio, imagen, categoría (select), activo, destacado, stock
-
-### 2.3 Páginas
-- ✅ **HomePage**: Hero, categorías destacadas (grid 4), productos destacados, sección "Cómo Comprar"
-- ✅ **ProductosPage**: Grid de productos con filtro por categoría (sidebar)
-- ✅ **ProductoPage**: Detalle completo con imagen, características grid, productos relacionados
-- ✅ **LoginPage**: Formulario email + password, guarda token en localStorage
-- ✅ **AdminPage**: Tabla de productos, botones editar/eliminar, cerrar sesión
-- ✅ **AdminNewPage / AdminEditPage**: Crear/editar producto con ProductForm
-
-### 2.4 API Client (`src/api/client.ts`)
-- ✅ `login()`, `getCategorias()`, `getProductos()`, `getProductosActivos()`, `getProducto()`
-- ✅ `createProducto()`, `updateProducto()`, `deleteProducto()` (con token)
-- ✅ `createCategoria()`, `updateCategoria()`, `deleteCategoria()` (con token)
-
-### 2.5 Pendientes Frontend
-- ✅ **@tanstack/react-query** — instalado y configurado
-- ✅ **`hooks/queries.ts`** — creado con hooks tipados:
-  - `useProductos()`, `useProducto(id)`, `useCategorias()`
-  - `useCreateProducto()`, `useUpdateProducto()`, `useDeleteProducto()`
-  - `useLogin()`
-  - `useCreateCategoria()`, `useUpdateCategoria()`, `useDeleteCategoria()`
-- ✅ **Skeleton loading** — ProductCardSkeleton, DetailSkeleton, TableSkeleton creados con animate-pulse
-- ✅ **Loading states** — todas las páginas integran isLoading con skeletons
-- ✅ **Admin CRUD para categorías** — AdminCategoriasPage con tabla + modal inline para crear/editar/eliminar
-- ✅ **ProductForm** — file upload directo + URL manual + preview de imagen + stock field
-- ✅ **Fix: Content-Type en client.ts** — merge de headers corregido, ahora POST/PATCH envía correctamente `Content-Type: application/json`
-- ✅ **Fix: @UseGuards en UsersController** — agregado `@UseGuards(JwtAuthGuard, RolesGuard)` a nivel clase
-- ✅ **Fix: stock en ProductForm** — `stock` incluido en el submit
-- ✅ **Fix: RolesGuard Reflector bug** — `RolesGuard` usaba `Reflector` vía DI (no disponible en ESM), reemplazado por `Reflect.getMetadata` directo. Sin esto POST/PATCH/DELETE daban 500
-- ✅ **Toast notifications** — componente `<Toast />` con contexto reemplaza todos los `alert()`
-- ✅ **Login persistente** — checkbox "Recordar sesión" (localStorage) o sessionStorage
-- ✅ **AdminRoute** — wrapper con `Navigate` que redirige a `/admin/login` si no hay token, protege todas las rutas `admin/*`
-- ✅ **UX para usuario no técnico** (tu papá):
-  - File upload directo (input file + preview) y URL manual
-  - Labels grandes, placeholders claros, todo en español
-  - Login persistente con "Recordar sesión"
-  - Mobile-friendly (overflow-auto en tablas)
-  - Toast en vez de alert()
-  - Stock field visible
-
----
-
-## 3. Backend + Frontend — Integración
+- ✅ **+939 productos +65 categorías desde Invid (`npm run sync`)**
 
 ### 3.1 Estado actual
 - ✅ Backend corriendo en `:3001`, todos los endpoints responden
 - ✅ Login funciona (testeado con curl)
-- ✅ Categorías (9) y Productos (16) se sirven correctamente
+- ✅ **955 productos** (16 seed + 939 Invid) y **74 categorías** (9 + 65)
 - ✅ Frontend compila y build sin errores
 
 ### 3.2 Pendiente
@@ -184,6 +125,40 @@
 
 ---
 
+## 5. Catálogo Invid Computers
+
+### 5.1 Scraper (`scripts/scraper.py`)
+- ✅ Scraper Python extrae productos de invidcomputers.com
+- ✅ Parsea sitemap.xml → 108 categorías → 1462 URLs
+- ✅ Extrae nombre, imagen, SKU, categoría, URL origen
+- ✅ Paginación automática (20 productos/página)
+- ✅ Deduplicación por nombre
+- ✅ Rate limit 1s entre requests
+- ✅ Output: `backend/seeds/seed-invid.json` (939 productos, 72 categorías)
+
+### 5.2 Import Script (`backend/src/seeds/import-invid.ts`)
+- ✅ Lee `seed-invid.json` → importa a TypeORM
+- ✅ Crea categorías nuevas (mapeo de slugs)
+- ✅ Upsert productos (no duplica existentes)
+- ✅ Agrega características: SKU + URL Invid
+- ✅ Agrega ProductoImagen para cada producto
+- ✅ Script `npm run sync` funcionando
+- ✅ **Resultado: 955 productos totales, 74 categorías**
+
+### 5.3 Flujo completo
+```bash
+# Scrapear catálogo
+python3 scripts/scraper.py
+
+# Importar a BD
+cd backend && npm run sync
+
+# Levantar
+npm run start:prod
+```
+
+---
+
 ## Resumen Visual
 
 | Área | Completado |
@@ -200,8 +175,10 @@
 | Galería + 404 + extras | ██████████ 100% |
 | Deploy | █████████░ 90% (config + docs listos, falta subir) |
 | E2E Testing | ██████████ 100% |
-| **Total** | **~95%** |
+| Catálogo Invid | ██████████ 100% (scraper + import funcionando) |
+| GitHub Action sync | ████░░░░░░ 40% (pendiente crear workflow) |
+| **Total** | **~96%** |
 
 ---
 
-> _Última actualización: 18/05/2026 — +Fix circular deps ESM (entidades consolidadas, string refs TypeORM), +emitDecoratorMetadata tsconfig.build.json, +render.yaml, +netlify.toml raiz con headers seguridad, +seed:prod, +DEPLOY.md, +E2E testing (13/13 OK), +Admin CRUD categorias probado, +Eliminado frontend/netlify.toml redundante_
+> _Última actualización: 18/05/2026 — +Scraper Invid (939 productos extraídos), +Import script a TypeORM, +955 productos totales en BD, +74 categorías, +npm run sync, +plan_database.md actualizado, seed.ts fix entity glob_
