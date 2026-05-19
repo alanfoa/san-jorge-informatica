@@ -146,16 +146,32 @@ Requisitos UX:
 ## Seed
 
 ```bash
-cd backend && npm run seed
+cd backend && npm run setup
 ```
 
-Crea: 2 usuarios, 9 categorías, 16 productos con características.
+Crea 1 admin + importa 939 productos de Invid en un solo comando.
 
 ## Comandos
 
 ```bash
-cd backend  && npm run start:dev    # :3001
-cd frontend && npm run dev          # :5173
-cd backend  && npm run seed         # Poblar datos
-cd frontend && npm run build        # → dist/
+# ── Primera vez (crear BD desde cero) ──
+cd backend  && npm run setup          # Crea admin + importa 939 productos Invid
+
+# ── Desarrollo ──
+cd backend  && npm run start:dev      # Backend en :3001
+cd frontend && npm run dev            # Frontend en :5173
+
+# ── Seed / Sync individual ──
+cd backend  && npm run seed           # Solo crear admin (si no existe)
+cd backend  && npm run sync           # Solo importar/actualizar catálogo Invid
+
+# ── Producción ──
+cd frontend && npm run build          # Build frontend → dist/
+cd backend  && npm run build          # Build backend → dist/
+cd backend  && npm run start:prod     # Backend en modo producción
 ```
+
+### Login por defecto
+
+- **Email:** `admin@sanjorge.com`
+- **Password:** `admin123`
