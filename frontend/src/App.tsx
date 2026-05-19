@@ -1,4 +1,5 @@
 import { Routes, Route } from 'react-router-dom'
+import { ScrollToTop } from '@/components/ScrollToTop'
 import { Navbar } from '@/components/Navbar'
 import { Footer } from '@/components/Footer'
 import { HomePage } from '@/pages/HomePage'
@@ -15,6 +16,7 @@ import { AdminRoute } from '@/components/AdminRoute'
 export default function App() {
   return (
     <>
+      <ScrollToTop />
       <Navbar />
       <Routes>
         <Route path="/" element={<HomePage />} />

@@ -122,21 +122,25 @@ export function ProductoPage() {
 
             <h1 className="text-4xl md:text-5xl font-bold text-white leading-tight">{p.nombre}</h1>
 
-            <p className="text-4xl font-bold text-transparent bg-clip-text bg-gradient-to-r from-cyan-400 to-purple-500">
-              ${p.precio.toLocaleString('es-AR')}
-            </p>
+            {p.precio > 0 && (
+              <p className="text-4xl font-bold text-transparent bg-clip-text bg-gradient-to-r from-cyan-400 to-purple-500">
+                ${p.precio.toLocaleString('es-AR')}
+              </p>
+            )}
 
             {p.descripcion && (
               <p className="text-gray-400 text-lg leading-relaxed">{p.descripcion}</p>
             )}
 
-            {p.caracteristicas && p.caracteristicas.length > 0 && (
+            {p.caracteristicas && p.caracteristicas.filter(c => c.nombre !== 'SKU' && c.nombre !== 'URL Invid').length > 0 && (
               <div className="border-t border-cyan-500/20 pt-6">
                 <h3 className="text-white font-bold text-lg mb-4 flex items-center gap-2">
                   <Info className="w-5 h-5 text-cyan-400" /> Especificaciones
                 </h3>
                 <div className="grid grid-cols-1 sm:grid-cols-2 gap-3">
-                  {p.caracteristicas.map((c, i) => (
+                  {p.caracteristicas
+                    .filter(c => c.nombre !== 'SKU' && c.nombre !== 'URL Invid')
+                    .map((c, i) => (
                     <div key={i} className="bg-gray-900/80 rounded-lg px-4 py-3 border border-cyan-500/10">
                       <span className="text-gray-500 text-xs uppercase tracking-wider">{c.nombre}</span>
                       <p className="text-white font-medium">{c.valor}</p>

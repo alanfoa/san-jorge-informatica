@@ -3,9 +3,177 @@ import { useSearchParams } from 'react-router-dom'
 import { ProductCard } from '@/components/ProductCard'
 import { ProductCardSkeleton } from '@/components/ProductCardSkeleton'
 import { useProductosActivos, useCategorias } from '@/hooks/queries'
-import { Search, Filter, X, ChevronLeft, ChevronRight } from 'lucide-react'
+import { Search, Filter, X, ChevronLeft, ChevronRight, ChevronDown } from 'lucide-react'
 
 const ITEMS_PER_PAGE = 24
+
+const GRUPOS: [string, string][] = [
+  ['streaming', 'Gamers'],
+  ['accesorios gamer', 'Gamers'],
+  ['sillas y escritorios', 'Gamers'],
+  ['teclados gamers', 'Gamers'],
+  ['gamers', 'Gamers'],
+
+  ['placas de video', 'Placas de Video'],
+
+  ['carry disk', 'Almacenamiento'],
+  ['disco rigido externo', 'Almacenamiento'],
+  ['disco ssd m2', 'Almacenamiento'],
+  ['disco ssd', 'Almacenamiento'],
+  ['almacenamiento', 'Almacenamiento'],
+
+  ['microprocesador', 'Procesadores'],
+  ['procesador', 'Procesadores'],
+
+  ['plataforma', 'Motherboards'],
+  ['mothers', 'Motherboards'],
+
+  ['monitor corporativo', 'Monitores'],
+  ['monitor consumo', 'Monitores'],
+  ['monitor gamer', 'Monitores'],
+  ['monitores', 'Monitores'],
+
+  ['watercoolers', 'Coolers'],
+  ['coolers', 'Coolers'],
+
+  ['multifuncion', 'Impresoras'],
+  ['ink jet', 'Impresoras'],
+  ['impresoras', 'Impresoras'],
+
+  ['tintas', 'Consumibles'],
+  ['cartuchos', 'Consumibles'],
+  ['consumibles hp', 'Consumibles'],
+  ['consumibles', 'Consumibles'],
+
+  ['web cam', 'Periféricos'],
+  ['mousepads', 'Periféricos'],
+  ['microfonos', 'Periféricos'],
+  ['parlantes', 'Periféricos'],
+  ['teclado mouse', 'Periféricos'],
+  ['mouse', 'Periféricos'],
+  ['teclados', 'Periféricos'],
+  ['perifericos', 'Periféricos'],
+
+  ['all in one', 'Computadoras'],
+  ['pc computadoras', 'Computadoras'],
+  ['computadoras', 'Computadoras'],
+
+  ['gabinetes con fuente', 'Gabinetes y Fuentes'],
+  ['gabinetes sin fuente', 'Gabinetes y Fuentes'],
+  ['fuentes de alimentacion', 'Gabinetes y Fuentes'],
+  ['gabinetes', 'Gabinetes y Fuentes'],
+
+  ['switches administrables', 'Conectividad'],
+  ['switches no administrables', 'Conectividad'],
+  ['access point', 'Conectividad'],
+  ['placas de red ethernet', 'Conectividad'],
+  ['placas de red wifi pci', 'Conectividad'],
+  ['placas de red wifi usb', 'Conectividad'],
+  ['modem adsl', 'Conectividad'],
+  ['router wireless', 'Conectividad'],
+  ['poe power over ethernet', 'Conectividad'],
+  ['media conv', 'Conectividad'],
+  ['camaras ip', 'Conectividad'],
+  ['accesorios bluetooth', 'Conectividad'],
+  ['smart home', 'Conectividad'],
+  ['de red cables', 'Conectividad'],
+  ['router', 'Conectividad'],
+  ['conectividad', 'Conectividad'],
+
+  ['papel resma', 'Papel y Varios'],
+  ['destacados', 'Destacados'],
+  ['electrodomesticos', 'Electrodomésticos'],
+  ['energia', 'Energía'],
+  ['memorias ram', 'Memorias Ram'],
+  ['notebooks', 'Notebooks'],
+  ['proyectores', 'Proyectores'],
+  ['super ofertas', 'Super Ofertas'],
+  ['tablets', 'Tablets'],
+]
+
+function getGrupo(nombre: string): string {
+  const n = nombre.toLowerCase()
+  for (const [keyword, grupo] of GRUPOS) {
+    if (n.includes(keyword)) return grupo
+  }
+  return nombre
+}
+
+const CLEAN_NAMES: Record<string, string> = {
+  'Conectividad': 'Conectividad',
+  'Electrodomesticos': 'Electrodomésticos',
+  'Fuentes De Alimentacion Gabinetes Y Fuentes': 'Fuentes de Alimentación',
+  'Multifuncion Impresoras': 'Impresoras Multifunción',
+  'Ink Jet Impresoras': 'Impresoras Ink Jet',
+  'Memorias Ram': 'Memorias RAM',
+  'Amd Microprocesadores': 'AMD',
+  'Intel Microprocesadores': 'Intel',
+  'Monitor Consumo Monitores': 'Monitores de Consumo',
+  'Monitor Corporativo Monitores': 'Monitores Corporativos',
+  'Monitor Gamer Monitores': 'Monitores Gamer',
+  'Plataforma Amd Mothers': 'Plataforma AMD',
+  'Plataforma Intel Mothers': 'Plataforma Intel',
+  'Linea Nvidia Geforce Placas De Video': 'NVIDIA GeForce',
+  'Linea Quadro Radeon Pro Placas De Video': 'NVIDIA Quadro / AMD Radeon Pro',
+  'Linea Amd Radeon Placas De Video': 'AMD Radeon',
+  'Papel Resma Varios': 'Papel y Resmas',
+  'Streaming Gamers': 'Streaming',
+  'Energia': 'Energía',
+  'Gabinetes': 'Gabinetes',
+  'Disco Rigido Externo Discos Rigidos Ssd': 'Discos Externos',
+  'Consumibles': 'Consumibles',
+  'Router Conectividad': 'Routers',
+  'All In One Computadoras': 'All In One',
+  'Media Conv Modulos Conectividad': 'Media Converter',
+  'Impresoras': 'Impresoras',
+  'Switches Administrables Conectividad': 'Switches Administrables',
+  'Super Ofertas': 'Super Ofertas',
+  'Notebooks': 'Notebooks',
+  'Switches No Administrables Conectividad': 'Switches No Administrables',
+  'Computadoras': 'Computadoras',
+  'Gabinetes Con Fuente Gabinetes Y Fuentes': 'Gabinetes con Fuente',
+  'Destacados': 'Destacados',
+  'Coolers': 'Coolers',
+  'Tintas Consumibles': 'Tintas',
+  'Cartuchos Consumibles': 'Cartuchos',
+  'Almacenamiento': 'Almacenamiento',
+  'Accesorios Gamer Gamers': 'Accesorios Gamer',
+  'Mousepads Perifericos': 'Mousepads',
+  'Sillas Y Escritorios Gamers': 'Sillas y Escritorios',
+  'Placas De Red Wifi Pci Conectividad': 'Placas WiFi PCI',
+  'Smart Home Conectividad': 'Smart Home',
+  'Consumibles Hp Consumibles': 'HP Consumibles',
+  'Perifericos': 'Periféricos',
+  'Carry Disk Discos Rigidos Ssd': 'Carry Disk',
+  'De Red Cables Conectividad': 'Cables de Red',
+  'Camaras Ip Conectividad': 'Cámaras IP',
+  'Watercoolers Coolers': 'Watercoolers',
+  'Proyectores': 'Proyectores',
+  'Tablets': 'Tablets',
+  'Mouse Perifericos': 'Mouse',
+  'Teclados Perifericos': 'Teclados',
+  'Parlantes Perifericos': 'Parlantes',
+  'Gamers': 'Gamers',
+  'Web Cam Perifericos': 'Webcams',
+  'Microfonos Perifericos': 'Micrófonos',
+  'Teclado Mouse Perifericos': 'Teclado + Mouse',
+  'Teclados Gamers': 'Teclados Gamer',
+  'Pc Computadoras': 'PC',
+  'Accesorios Bluetooth Conectividad': 'Accesorios Bluetooth',
+  'Access Point Y Extensores De Rango Conectividad': 'Access Points',
+  'Modem Adsl Y Gpon Conectividad': 'Módems ADSL / GPON',
+  'Placas De Red Ethernet Y Adaptadores Usb Conectividad': 'Placas Ethernet / USB',
+  'Placas De Red Wifi Usb Conectividad': 'Placas WiFi USB',
+  'Poe Power Over Ethernet Conectividad': 'PoE / Power over Ethernet',
+  'Router Wireless Conectividad': 'Routers Wireless',
+  'Disco Ssd Discos Rigidos Ssd': 'Discos SSD',
+  'Disco Ssd M2 Discos Rigidos Ssd': 'Discos SSD M.2',
+  'Gabinetes Sin Fuente Gabinetes Y Fuentes': 'Gabinetes sin Fuente',
+}
+
+function nombreLimpio(original: string): string {
+  return CLEAN_NAMES[original] ?? original
+}
 
 export function ProductosPage() {
   const [searchParams, setSearchParams] = useSearchParams()
@@ -13,10 +181,11 @@ export function ProductosPage() {
   const { data: categorias = [] } = useCategorias()
   const [busqueda, setBusqueda] = useState('')
   const [categoriasSeleccionadas, setCategoriasSeleccionadas] = useState<string[]>(
-    searchParams.get('categoria') ? [searchParams.get('categoria')!] : []
+    searchParams.getAll('categoria')
   )
   const [mostrarFiltros, setMostrarFiltros] = useState(false)
   const [pagina, setPagina] = useState(1)
+  const [gruposAbiertos, setGruposAbiertos] = useState<Set<string>>(new Set())
 
   const productosFiltrados = useMemo(() => {
     return productos.filter((producto) => {
@@ -36,6 +205,21 @@ export function ProductosPage() {
     })
   }, [busqueda, categoriasSeleccionadas, productos])
 
+  const categoriasAgrupadas = useMemo(() => {
+    const grupos = new Map<string, typeof categorias>()
+    for (const cat of categorias) {
+      const grupo = getGrupo(cat.nombre)
+      if (!grupos.has(grupo)) grupos.set(grupo, [])
+      grupos.get(grupo)!.push(cat)
+    }
+    return [...grupos.entries()]
+      .map(([nombre, items]) => ({
+        nombre,
+        items: items.sort((a, b) => a.nombre.localeCompare(b.nombre)),
+      }))
+      .sort((a, b) => a.nombre.localeCompare(b.nombre))
+  }, [categorias])
+
   const totalPaginas = Math.max(1, Math.ceil(productosFiltrados.length / ITEMS_PER_PAGE))
   const inicio = (pagina - 1) * ITEMS_PER_PAGE
   const productosPagina = productosFiltrados.slice(inicio, inicio + ITEMS_PER_PAGE)
@@ -45,9 +229,13 @@ export function ProductosPage() {
   }, [busqueda, categoriasSeleccionadas])
 
   const toggleCategoria = (slug: string) => {
-    setCategoriasSeleccionadas((prev) =>
-      prev.includes(slug) ? prev.filter((c) => c !== slug) : [...prev, slug]
-    )
+    setCategoriasSeleccionadas((prev) => {
+      const next = prev.includes(slug) ? prev.filter((c) => c !== slug) : [...prev, slug]
+      const params = new URLSearchParams()
+      for (const c of next) params.append('categoria', c)
+      setSearchParams(params, { replace: true })
+      return next
+    })
   }
 
   const limpiarFiltros = () => {
@@ -158,20 +346,43 @@ export function ProductosPage() {
                 </button>
               </div>
               <div className="space-y-2">
-                {categorias.map((cat) => (
-                  <label key={cat.id} className="flex items-center gap-3 text-gray-300 hover:text-white cursor-pointer group">
-                    <input
-                      type="checkbox"
-                      checked={categoriasSeleccionadas.includes(cat.slug)}
-                      onChange={() => toggleCategoria(cat.slug)}
-                      className="w-4 h-4 rounded border-cyan-500/30 bg-gray-800 text-cyan-500 focus:ring-cyan-500/50 focus:ring-2"
-                    />
-                    <span className="text-sm group-hover:text-cyan-400 transition-colors">{cat.nombre}</span>
-                    <span className="text-xs text-gray-500 ml-auto">
-                      ({productos.filter((p) => p.categoria?.slug === cat.slug).length})
-                    </span>
-                  </label>
-                ))}
+                {categoriasAgrupadas.map((grupo) => {
+                  const abierto = gruposAbiertos.has(grupo.nombre)
+                  return (
+                    <div key={grupo.nombre}>
+                      <button
+                        onClick={() => {
+                          const next = new Set(gruposAbiertos)
+                          if (abierto) next.delete(grupo.nombre)
+                          else next.add(grupo.nombre)
+                          setGruposAbiertos(next)
+                        }}
+                        className="flex items-center gap-2 w-full text-left text-cyan-400 font-semibold text-sm py-1.5 hover:text-cyan-300 transition-colors"
+                      >
+                        <ChevronDown className={`w-4 h-4 transition-transform ${abierto ? '' : '-rotate-90'}`} />
+                        {grupo.nombre}
+                      </button>
+                      {abierto && (
+                        <div className="ml-4 space-y-1 border-l border-cyan-500/20 pl-3">
+                          {grupo.items.map((cat) => (
+                            <label key={cat.id} className="flex items-center gap-3 text-gray-300 hover:text-white cursor-pointer group py-0.5">
+                              <input
+                                type="checkbox"
+                                checked={categoriasSeleccionadas.includes(cat.slug)}
+                                onChange={() => toggleCategoria(cat.slug)}
+                                className="w-3.5 h-3.5 rounded border-cyan-500/30 bg-gray-800 text-cyan-500 focus:ring-cyan-500/50 focus:ring-2"
+                              />
+                              <span className="text-xs group-hover:text-cyan-400 transition-colors">{nombreLimpio(cat.nombre)}</span>
+                              <span className="text-xs text-gray-500 ml-auto">
+                                ({productos.filter((p) => p.categoria?.slug === cat.slug).length})
+                              </span>
+                            </label>
+                          ))}
+                        </div>
+                      )}
+                    </div>
+                  )
+                })}
               </div>
             </div>
           )}

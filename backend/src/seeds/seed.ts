@@ -18,21 +18,24 @@ async function seed() {
   await ds.initialize();
   console.log("✓ Conectado a la base de datos");
 
+  // Eliminar usuario legacy si existe
+  await ds.query("DELETE FROM users WHERE email = ?", ["admin@sanjorge.com"]);
+
   // Solo crear usuario admin si no existe
   const existing = await ds.query(
     "SELECT id FROM users WHERE email = ?",
-    ["admin@sanjorge.com"]
+    ["sanjorgeinf@hotmail.com"]
   );
 
   if (existing.length > 0) {
-    console.log("✓ Usuario admin ya existe (email: admin@sanjorge.com)");
+    console.log("✓ Usuario admin ya existe (email: sanjorgeinf@hotmail.com)");
   } else {
-    const pass = await bcrypt.hash("admin123", 10);
+    const pass = await bcrypt.hash("Academia01", 10);
     await ds.query(
       "INSERT INTO users (nombre, email, password, rol, activo) VALUES (?, ?, ?, ?, ?)",
-      ["Administrador", "admin@sanjorge.com", pass, "admin", 1]
+      ["Administrador", "sanjorgeinf@hotmail.com", pass, "admin", 1]
     );
-    console.log("✓ Usuario admin creado (email: admin@sanjorge.com / pass: admin123)");
+    console.log("✓ Usuario admin creado (email: sanjorgeinf@hotmail.com / pass: Academia01)");
   }
 
   await ds.destroy();

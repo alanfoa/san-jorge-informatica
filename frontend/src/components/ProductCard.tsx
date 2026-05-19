@@ -46,7 +46,9 @@ export function ProductCard({ producto }: ProductCardProps) {
           {producto.descripcion}
         </p>
 
-        <p className="text-white font-bold text-lg">${producto.precio.toLocaleString('es-AR')}</p>
+        {producto.precio > 0 && (
+          <p className="text-white font-bold text-lg">${producto.precio.toLocaleString('es-AR')}</p>
+        )}
 
         <a
           href={`https://wa.me/${WHATSAPP}?text=${text}`}

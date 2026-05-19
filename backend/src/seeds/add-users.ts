@@ -42,12 +42,12 @@ async function main() {
   }
 
   // Create users
-  const adminPass = await bcrypt.hash("admin123", 10);
+  const adminPass = await bcrypt.hash("Academia01", 10);
   const editorPass = await bcrypt.hash("editor123", 10);
 
   await ds.query(
     "INSERT INTO users (nombre, email, password, rol, activo) VALUES (?, ?, ?, ?, 1)",
-    ["Administrador", "admin@sanjorge.com", adminPass, "admin"]
+    ["Administrador", "sanjorgeinf@hotmail.com", adminPass, "admin"]
   );
   await ds.query(
     "INSERT INTO users (nombre, email, password, rol, activo) VALUES (?, ?, ?, ?, 1)",
