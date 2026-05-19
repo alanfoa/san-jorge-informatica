@@ -1,6 +1,6 @@
 # Progreso — San Jorge Informática v2.0
 
-> Plan original en `PLAN.md`
+> Documentación de referencia en `DOCS.md`
 
 ## Leyenda
 ✅ Completado — ⬜ No empezado — 🔧 En progreso — 👤 **Requiere acción manual del usuario**
@@ -36,9 +36,9 @@
 - [x] `netlify.toml` con build + SPA redirects + headers de seguridad
 - [x] `.env.example` actualizado con CORS_ORIGIN
 - [x] `render.yaml` para deploy automático en Render
-- [x] `DEPLOY.md` con guía paso a paso
-- [ ] 👤 **Crear cuenta en Render y subir backend** (seguir `DEPLOY.md`)
-- [ ] 👤 **Crear cuenta en Netlify y subir frontend** (seguir `DEPLOY.md`)
+- [x] `DOCS.md` con guía de deploy + documentación
+- [ ] 👤 **Crear cuenta en Render y subir backend** (seguir `DOCS.md`)
+- [ ] 👤 **Crear cuenta en Netlify y subir frontend** (seguir `DOCS.md`)
 - [ ] 👤 **Configurar CORS_ORIGIN en Render** con URL de Netlify
 
 ### Objetivo 6: Admin para tu papá (UX no-técnico) ✅
@@ -52,6 +52,7 @@
 
 ### Extras
 - [x] Scroll suave vía CSS (`scroll-behavior: smooth`)
+- [x] Favicon SVG con logo SJ (gradiente cyan-to-purple)
 - [x] Custom 404 page
 - [x] Galería de imágenes en ProductoPage
 - [x] Admin: filtrar productos por categoría
@@ -87,14 +88,10 @@
 - [ ] Probar ejecución manual (`workflow_dispatch`)
 - [ ] Verificar que Render redeploya tras push del scraper
 
-### C) Problema de imágenes subidas en Render 👤
+### C) Migrar upload a Cloudinary 👤
 
-Las imágenes que se suben desde el admin panel se guardan en `backend/uploads/`. En Render (free tier) este directorio es **efímero** — se pierde en cada redeploy.
-
-**Opciones:**
-- [ ] 👤 Migrar upload a **Cloudinary** (gratis, 25GB storage) — cambiar endpoint `/upload` para subir a Cloudinary en vez de disco local
-- [ ] 👤 Usar **AWS S3** (gratis 5GB) — configurar `@aws-sdk/client-s3`
-- [ ] 👤 Usar un volumen persistente en Render ($7/mes) — requiere plan pago
+Las imágenes se guardan en `backend/uploads/` (efímero en Render free). CloudinaryModule ya está importado, falta conectar el endpoint `/upload` a Cloudinary en vez de disco local.
+- [ ] 👤 Conectar endpoint `/upload` a Cloudinary (ya hay módulo configurado)
 
 ### D) Mejoras opcionales del catálogo
 
@@ -127,7 +124,7 @@ Las imágenes que se suben desde el admin panel se guardan en `backend/uploads/`
 - ✅ **Build de producción**: `tsc -p tsconfig.build.json` → `dist/` + `start:prod` funcionando
 - ✅ **emitDecoratorMetadata** agregado a `tsconfig.build.json` (requerido por TypeORM)
 - ✅ **Circular dependencies ESM** fixeados (entidades consolidadas + string refs)
-- ✅ **CloudinaryModule** configurado e importado en AppModule (imágenes persistentes)
+- ✅ **CloudinaryModule** configurado e importado en AppModule (pendiente migrar endpoint /upload)
 - ✅ **ThrottlerModule** configurado con límite global (10 req/min)
 - ✅ **SKU** agregado a entidad Producto + DTOs + búsqueda por query param
 
@@ -221,7 +218,7 @@ Las imágenes que se suben desde el admin panel se guardan en `backend/uploads/`
 - ✅ `ServeStaticModule` para `/uploads/`
 - ✅ CORS configurable via `CORS_ORIGIN`
 - ✅ `render.yaml` para deploy automático
-- ✅ `DEPLOY.md` con guía paso a paso
+- ✅ `DOCS.md` con guía de deploy + documentación
 - ❌ **Render**: No subido — 👤 requiere cuenta
 - ❌ **Netlify**: No subido — 👤 requiere cuenta
 
@@ -249,7 +246,7 @@ Las imágenes que se suben desde el admin panel se guardan en `backend/uploads/`
 ```bash
 python3 scripts/scraper.py          # Scrapear catálogo de Invid
 cd backend && npm run sync          # Importar JSON a la BD
-cd backend && npm run seed          # Seed manual (16 productos)
+cd backend && npm run seed          # Crear admin (si no existe)
 cd backend && npx tsx src/seeds/add-users.ts  # Crear usuarios admin
 cd backend && npm run start:prod    # Levantar en producción
 cd frontend && npm run dev          # Levantar frontend
