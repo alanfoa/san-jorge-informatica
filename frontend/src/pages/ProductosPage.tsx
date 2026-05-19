@@ -3,9 +3,33 @@ import { useSearchParams } from 'react-router-dom'
 import { ProductCard } from '@/components/ProductCard'
 import { ProductCardSkeleton } from '@/components/ProductCardSkeleton'
 import { useProductosActivos, useCategorias } from '@/hooks/queries'
-import { Search, Filter, X, ChevronLeft, ChevronRight } from 'lucide-react'
+import { Search, Filter, X, ChevronLeft, ChevronRight, ChevronDown } from 'lucide-react'
 
 const ITEMS_PER_PAGE = 24
+
+const GRUPOS: Record<string, string> = {
+  'placas de video': 'Placas de Video',
+  'discos rigidos ssd': 'Almacenamiento',
+  'microprocesadores': 'Procesadores',
+  'mothers': 'Motherboards',
+  'monitores': 'Monitores',
+  'conectividad': 'Conectividad',
+  'consumibles': 'Consumibles',
+  'perifericos': 'Periféricos',
+  'gabinetes y fuentes': 'Gabinetes y Fuentes',
+  'gamers': 'Gamers',
+  'computadoras': 'Computadoras',
+  'coolers': 'Coolers',
+  'impresoras': 'Impresoras',
+}
+
+function getGrupo(nombre: string): string | null {
+  const n = nombre.toLowerCase()
+  for (const [keyword, grupo] of Object.entries(GRUPOS)) {
+    if (n.includes(keyword)) return grupo
+  }
+  return null
+}
 
 export function ProductosPage() {
   const [searchParams, setSearchParams] = useSearchParams()
@@ -17,6 +41,7 @@ export function ProductosPage() {
   )
   const [mostrarFiltros, setMostrarFiltros] = useState(false)
   const [pagina, setPagina] = useState(1)
+  const [gruposAbiertos, setGruposAbiertos] = useState<Set<string>>(new Set())
 
   const productosFiltrados = useMemo(() => {
     return productos.filter((producto) => {
@@ -35,6 +60,25 @@ export function ProductosPage() {
       return matchBusqueda && matchCategoria
     })
   }, [busqueda, categoriasSeleccionadas, productos])
+
+  const categoriasAgrupadas = useMemo(() => {
+    const grupos = new Map<string, typeof categorias>()
+    const sueltas: typeof categorias = []
+    for (const cat of categorias) {
+      const grupo = getGrupo(cat.nombre)
+      if (grupo) {
+        if (!grupos.has(grupo)) grupos.set(grupo, [])
+        grupos.get(grupo)!.push(cat)
+      } else {
+        sueltas.push(cat)
+      }
+    }
+    const entradas = [...grupos.entries()].map(([nombre, cats]) => ({
+      nombre,
+      items: cats.sort((a, b) => a.nombre.localeCompare(b.nombre)),
+    })).sort((a, b) => a.nombre.localeCompare(b.nombre))
+    return { grupos: entradas, sueltas: sueltas.sort((a, b) => a.nombre.localeCompare(b.nombre)) }
+  }, [categorias])
 
   const totalPaginas = Math.max(1, Math.ceil(productosFiltrados.length / ITEMS_PER_PAGE))
   const inicio = (pagina - 1) * ITEMS_PER_PAGE
@@ -162,13 +206,50 @@ export function ProductosPage() {
                 </button>
               </div>
               <div className="space-y-2">
-                {categorias.map((cat) => (
-                  <label key={cat.id} className="flex items-center gap-3 text-gray-300 hover:text-white cursor-pointer group">
+                {categoriasAgrupadas.grupos.map((grupo) => {
+                  const abierto = gruposAbiertos.has(grupo.nombre)
+                  return (
+                    <div key={grupo.nombre}>
+                      <button
+                        onClick={() => {
+                          const next = new Set(gruposAbiertos)
+                          if (abierto) next.delete(grupo.nombre)
+                          else next.add(grupo.nombre)
+                          setGruposAbiertos(next)
+                        }}
+                        className="flex items-center gap-2 w-full text-left text-cyan-400 font-semibold text-sm py-1.5 hover:text-cyan-300 transition-colors"
+                      >
+                        <ChevronDown className={`w-4 h-4 transition-transform ${abierto ? '' : '-rotate-90'}`} />
+                        {grupo.nombre}
+                      </button>
+                      {abierto && (
+                        <div className="ml-4 space-y-1 border-l border-cyan-500/20 pl-3">
+                          {grupo.items.map((cat) => (
+                            <label key={cat.id} className="flex items-center gap-3 text-gray-300 hover:text-white cursor-pointer group py-0.5">
+                              <input
+                                type="checkbox"
+                                checked={categoriasSeleccionadas.includes(cat.slug)}
+                                onChange={() => toggleCategoria(cat.slug)}
+                                className="w-3.5 h-3.5 rounded border-cyan-500/30 bg-gray-800 text-cyan-500 focus:ring-cyan-500/50 focus:ring-2"
+                              />
+                              <span className="text-xs group-hover:text-cyan-400 transition-colors">{cat.nombre}</span>
+                              <span className="text-xs text-gray-500 ml-auto">
+                                ({productos.filter((p) => p.categoria?.slug === cat.slug).length})
+                              </span>
+                            </label>
+                          ))}
+                        </div>
+                      )}
+                    </div>
+                  )
+                })}
+                {categoriasAgrupadas.sueltas.map((cat) => (
+                  <label key={cat.id} className="flex items-center gap-3 text-gray-300 hover:text-white cursor-pointer group py-0.5">
                     <input
                       type="checkbox"
                       checked={categoriasSeleccionadas.includes(cat.slug)}
                       onChange={() => toggleCategoria(cat.slug)}
-                      className="w-4 h-4 rounded border-cyan-500/30 bg-gray-800 text-cyan-500 focus:ring-cyan-500/50 focus:ring-2"
+                      className="w-3.5 h-3.5 rounded border-cyan-500/30 bg-gray-800 text-cyan-500 focus:ring-cyan-500/50 focus:ring-2"
                     />
                     <span className="text-sm group-hover:text-cyan-400 transition-colors">{cat.nombre}</span>
                     <span className="text-xs text-gray-500 ml-auto">
