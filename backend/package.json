@@ -10,6 +10,7 @@
     "seed": "tsx src/seeds/seed.ts",
     "seed:prod": "node dist/seeds/seed.js",
     "sync": "tsx src/seeds/import-invid.ts",
+    "setup": "tsx src/seeds/seed.ts && tsx src/seeds/import-invid.ts",
     "typeorm": "typeorm-ts-node-commonjs",
     "migration:run": "tsx src/database/data-source.ts run",
     "migration:generate": "tsx src/database/data-source.ts generate",

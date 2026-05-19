@@ -153,11 +153,11 @@ Las imágenes que se suben desde el admin panel se guardan en `backend/uploads/`
 - ✅ **Upload**: POST /upload con Multer (file size/type validation)
 
 ### 1.5 Seed y Catálogo
-- ✅ Seed manual: 2 usuarios, 9 categorías, 16 productos
-- ✅ **Scraper Invid**: 939 productos extraídos de 108 categorías
+- ✅ Seed solo crea 1 admin (sin tocar productos/categorías existentes)
+- ✅ **Scraper Invid**: 939 productos extraídos de 72 categorías
 - ✅ **Import script**: `npm run sync` importa JSON → TypeORM
-- ✅ **Add users script**: `npx tsx src/seeds/add-users.ts` crea admin sin seed manual
-- ✅ **BD actual**: 939 productos + 69 categorías + 2 usuarios
+- ✅ **Setup completo**: `npm run setup` crea admin + importa Invid
+- ✅ **BD actual**: 939 productos + 69 categorías + 1 admin (solo datos Invid)
 
 ---
 
@@ -279,4 +279,4 @@ cd frontend && npm run dev          # Levantar frontend
 | **Total proyecto** | **~85%** (incluye deploy pendiente) |
 
 ---
-> _Última actualización: 18/05/2026 — Fixes aplicados: app.module.ts con ThrottlerModule + CloudinaryModule, auth.controller.ts con rate limiting, type query de SKU arreglado, dependencias instaladas, builds OK. **Pendiente: subir a Render + Netlify, GitHub Action sync**_
+> _Última actualización: 18/05/2026 — Seed reescrito: solo crea 1 admin, no toca productos/categorías. `npm run setup` = seed + sync. BD: 1 admin, 69 categorías, 939 productos (solo Invid). **Pendiente: subir a Render + Netlify, GitHub Action sync**_
