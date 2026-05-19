@@ -8,3 +8,4 @@ dist/
 Thumbs.db
 plan_database.md
 *.tsbuildinfo
+.aider*

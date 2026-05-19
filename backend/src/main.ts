@@ -5,7 +5,6 @@ import { NestExpressApplication } from "@nestjs/platform-express";
 import { join } from "path";
 import { fileURLToPath } from "url";
 import { AppModule } from "./app.module.js";
-import { ThrottlerGuard } from '@nestjs/throttler'; // Importar ThrottlerGuard
 
 const __dirname = fileURLToPath(new URL(".", import.meta.url));
 
@@ -27,7 +26,6 @@ async function bootstrap() {
   });
 
   app.useGlobalPipes(new ValidationPipe({ transform: true, whitelist: true }));
-  app.useGlobalGuards(new ThrottlerGuard()); // Registrar ThrottlerGuard globalmente
 
   const port = process.env.PORT || 3001;
   await app.listen(port);

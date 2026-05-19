@@ -17,6 +17,7 @@ export class ProductosService {
     activo?: boolean;
     destacado?: boolean;
     search?: string;
+    sku?: string;
   }) {
     const where: any = {};
     if (query?.categoriaId) where.categoriaId = query.categoriaId;
