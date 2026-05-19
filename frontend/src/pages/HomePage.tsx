@@ -2,25 +2,77 @@ import { Link } from 'react-router-dom'
 import { ProductCard } from '@/components/ProductCard'
 import { ProductCardSkeleton } from '@/components/ProductCardSkeleton'
 import { useProductosActivos } from '@/hooks/queries'
-import { Cpu, HardDrive, MonitorPlay, Gamepad2, Search, MessageCircle, Truck, Zap } from 'lucide-react'
+import {
+  Cpu, HardDrive, MonitorPlay, Gamepad2, Monitor,
+  Printer, Tablet, Package, Headphones, Camera, Wifi,
+  Search, MessageCircle, Truck, Zap,
+} from 'lucide-react'
 import { WHATSAPP } from '@/lib/constants'
+
+function iconoParaCategoria(nombre: string): React.ReactNode {
+  const n = nombre.toLowerCase()
+  if (/video|vga|grafica|monitor/i.test(n)) return <MonitorPlay className="w-8 h-8" />
+  if (/micro|procesador|cpu/i.test(n)) return <Cpu className="w-8 h-8" />
+  if (/disco|ssd|almacenamiento|hd[ds]/i.test(n)) return <HardDrive className="w-8 h-8" />
+  if (/mouse|teclado|periferico|parlante|audifono/i.test(n)) return <Gamepad2 className="w-8 h-8" />
+  if (/router|wifi|red|conectividad|switch|modem|access.point/i.test(n)) return <Wifi className="w-8 h-8" />
+  if (/impresora|cartucho|tinta|consumible/i.test(n)) return <Printer className="w-8 h-8" />
+  if (/tablet/i.test(n)) return <Tablet className="w-8 h-8" />
+  if (/camara|web.cam/i.test(n)) return <Camera className="w-8 h-8" />
+  if (/notebook|pc|computadora/i.test(n)) return <Monitor className="w-8 h-8" />
+  if (/cooler|gabinete|fuente/i.test(n)) return <Package className="w-8 h-8" />
+  if (/auricular|cascos/i.test(n)) return <Headphones className="w-8 h-8" />
+  return <MonitorPlay className="w-8 h-8" />
+}
 
 export function HomePage() {
   const { data: productos = [], isLoading } = useProductosActivos()
-
-  const iconosCategoria: Record<string, React.ReactNode> = {
-    'Placas de Video': <MonitorPlay className="w-8 h-8" />,
-    Procesadores: <Cpu className="w-8 h-8" />,
-    Almacenamiento: <HardDrive className="w-8 h-8" />,
-    'Periféricos': <Gamepad2 className="w-8 h-8" />,
-  }
-
-  const categoriasDestacadas = ['Placas de Video', 'Procesadores', 'Almacenamiento', 'Periféricos']
 
   const productosMostrados = productos.filter(p => p.destacado).slice(0, 4)
   if (productosMostrados.length < 4) {
     const rest = productos.filter(p => !p.destacado).slice(0, 4 - productosMostrados.length)
     productosMostrados.push(...rest)
+  }
+
+  const catMap = new Map<string, { nombre: string; slug: string; count: number }>()
+  for (const p of productos) {
+    const slug = p.categoria?.slug
+    const nombre = p.categoria?.nombre
+    if (slug && nombre) {
+      if (!catMap.has(slug)) catMap.set(slug, { nombre, slug, count: 0 })
+      catMap.get(slug)!.count++
+    }
+  }
+
+  interface CatDeseada { nombre: string; keywords: string[] }
+  const DESEADAS: CatDeseada[] = [
+    { nombre: 'Procesadores', keywords: ['procesador', 'microprocesador'] },
+    { nombre: 'Tarjetas Gráficas', keywords: ['grafica', 'video', 'vga'] },
+    { nombre: 'Memoria Ram', keywords: ['memoria', 'ram'] },
+    { nombre: 'Almacenamiento', keywords: ['almacenamiento', 'disco', 'ssd', 'hdd'] },
+  ]
+  const catList = [...catMap.values()]
+  const slugsUsados = new Set<string>()
+  const topCats = DESEADAS.map(({ nombre, keywords }) => {
+    const matches = catList.filter(c =>
+      keywords.some(k => c.nombre.toLowerCase().includes(k))
+    )
+    if (matches.length === 0) return null
+    for (const m of matches) slugsUsados.add(m.slug)
+    return {
+      nombre,
+      slugs: matches.map(m => m.slug),
+      count: matches.reduce((s, c) => s + c.count, 0)
+    }
+  }).filter((c): c is NonNullable<typeof c> => c !== null)
+
+  if (topCats.length < 4) {
+    const restantes = catList
+      .filter(c => !slugsUsados.has(c.slug))
+      .sort((a, b) => b.count - a.count)
+    for (const r of restantes.slice(0, 4 - topCats.length)) {
+      topCats.push({ nombre: r.nombre, slugs: [r.slug], count: r.count })
+    }
   }
 
   return (
@@ -74,14 +126,15 @@ export function HomePage() {
               </div>
             </div>
 
-            <div className="relative">
+            <div className="relative group">
               <div className="relative">
                 <img
-                  src="https://images.unsplash.com/photo-1591488320449-011701bb6704?w=800&auto=format&fit=crop"
+                  src="/5090.png"
                   alt="Gaming Setup"
-                  className="rounded-2xl shadow-2xl shadow-purple-500/30"
+                  className="rounded-2xl shadow-2xl shadow-purple-500/30 transition-all duration-500 group-hover:scale-[1.02] group-hover:shadow-purple-500/60"
                 />
-                <div className="absolute -inset-4 bg-gradient-to-r from-cyan-500/20 to-purple-600/20 blur-3xl -z-10"></div>
+                <div className="absolute inset-0 rounded-2xl bg-gradient-to-t from-black/60 via-transparent to-transparent opacity-0 group-hover:opacity-100 transition-opacity duration-500 pointer-events-none"></div>
+                <div className="absolute -inset-4 bg-gradient-to-r from-cyan-500/20 to-purple-600/20 blur-3xl -z-10 group-hover:from-cyan-500/40 group-hover:to-purple-600/40 transition-all duration-500"></div>
               </div>
             </div>
           </div>
@@ -102,27 +155,34 @@ export function HomePage() {
           </div>
 
           <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-4 gap-6">
-            {categoriasDestacadas.map((categoria) => {
-              const slug = categoria.toLowerCase().replace(/\s+/g, '-')
-              return (
+            {topCats.map((cat) => { return (
                 <Link
-                  key={categoria}
-                  to={`/productos?categoria=${slug}`}
+                  key={cat.slugs[0]}
+                  to={`/productos?${cat.slugs.map(s => `categoria=${encodeURIComponent(s)}`).join('&')}`}
                   className="group relative bg-gradient-to-br from-gray-900/90 to-gray-800/90 backdrop-blur-sm rounded-2xl border border-cyan-500/20 hover:border-cyan-500/60 p-8 transition-all duration-300 hover:shadow-xl hover:shadow-cyan-500/20 hover:-translate-y-2"
                 >
                   <div className="text-cyan-400 mb-4 group-hover:scale-110 group-hover:text-cyan-300 transition-all">
-                    {iconosCategoria[categoria] || <MonitorPlay className="w-8 h-8" />}
+                    {iconoParaCategoria(cat.nombre)}
                   </div>
                   <h3 className="text-white font-bold text-xl mb-2 group-hover:text-cyan-400 transition-colors">
-                    {categoria}
+                    {cat.nombre}
                   </h3>
                   <p className="text-gray-400 text-sm">
-                    {productos.filter((p) => p.categoria?.slug === slug).length} productos disponibles
+                    {cat.count} productos disponibles
                   </p>
                   <div className="absolute top-4 right-4 w-2 h-2 bg-cyan-500 rounded-full animate-pulse"></div>
                 </Link>
-              )
-            })}
+              );})}
+          </div>
+
+          <div className="text-center mt-12">
+            <Link
+              to="/productos"
+              className="inline-flex items-center gap-2 px-8 py-4 bg-gradient-to-r from-cyan-500 to-purple-600 text-white rounded-xl font-bold shadow-lg shadow-cyan-500/50 hover:shadow-cyan-500/80 hover:scale-105 transition-all"
+            >
+              Ver Catálogo Completo
+              <Zap className="w-5 h-5" />
+            </Link>
           </div>
         </div>
       </section>

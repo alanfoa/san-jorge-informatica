@@ -33,7 +33,7 @@ export function LoginPage() {
           )}
           <div>
             <label className="block text-sm font-medium text-gray-300 mb-1">Email</label>
-            <input name="email" type="email" required className="w-full px-3 py-2 bg-gray-900 border border-cyan-500/20 rounded-lg text-sm text-white focus:outline-none focus:ring-2 focus:ring-cyan-500 placeholder-gray-500" placeholder="admin@sanjorge.com" />
+            <input name="email" type="email" required className="w-full px-3 py-2 bg-gray-900 border border-cyan-500/20 rounded-lg text-sm text-white focus:outline-none focus:ring-2 focus:ring-cyan-500 placeholder-gray-500" placeholder="sanjorgeinf@hotmail.com" />
           </div>
           <div>
             <label className="block text-sm font-medium text-gray-300 mb-1">Contraseña</label>

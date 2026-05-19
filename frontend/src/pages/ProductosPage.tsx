@@ -13,7 +13,7 @@ export function ProductosPage() {
   const { data: categorias = [] } = useCategorias()
   const [busqueda, setBusqueda] = useState('')
   const [categoriasSeleccionadas, setCategoriasSeleccionadas] = useState<string[]>(
-    searchParams.get('categoria') ? [searchParams.get('categoria')!] : []
+    searchParams.getAll('categoria')
   )
   const [mostrarFiltros, setMostrarFiltros] = useState(false)
   const [pagina, setPagina] = useState(1)
@@ -45,9 +45,13 @@ export function ProductosPage() {
   }, [busqueda, categoriasSeleccionadas])
 
   const toggleCategoria = (slug: string) => {
-    setCategoriasSeleccionadas((prev) =>
-      prev.includes(slug) ? prev.filter((c) => c !== slug) : [...prev, slug]
-    )
+    setCategoriasSeleccionadas((prev) => {
+      const next = prev.includes(slug) ? prev.filter((c) => c !== slug) : [...prev, slug]
+      const params = new URLSearchParams()
+      for (const c of next) params.append('categoria', c)
+      setSearchParams(params, { replace: true })
+      return next
+    })
   }
 
   const limpiarFiltros = () => {

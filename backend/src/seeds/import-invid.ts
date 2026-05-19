@@ -69,6 +69,17 @@ async function main() {
   await ds.initialize();
   console.log("✓ Conectado a la base de datos");
 
+  // ── 0. Limpiar Caracteristicas internas viejas (SKU y URL Invid) ──
+  const deleteResult = await ds
+    .createQueryBuilder()
+    .delete()
+    .from("caracteristicas")
+    .where("nombre IN ('SKU', 'URL Invid')")
+    .execute();
+  if (deleteResult.affected && deleteResult.affected > 0) {
+    console.log(`  Limpiadas ${deleteResult.affected} Caracteristicas internas (SKU / URL Invid)`);
+  }
+
   // ── 1. Crear categorías que no existan ──
   const catRepo = ds.getRepository(Categoria);
   const existingCats = await catRepo.find();
@@ -176,22 +187,17 @@ async function main() {
       imgCreated++;
     }
 
-    // Agregar SKU como característica
-    if (p.sku) {
-      const sku = new Caracteristica();
-      sku.nombre = "SKU";
-      sku.valor = p.sku;
-      sku.productoId = saved.id;
-      await charRepo.save(sku);
-    }
-
-    // Agregar URL de origen como característica
-    if (p.url_origen) {
-      const urlChar = new Caracteristica();
-      urlChar.nombre = "URL Invid";
-      urlChar.valor = p.url_origen;
-      urlChar.productoId = saved.id;
-      await charRepo.save(urlChar);
+    // Agregar caracteristicas reales (specs scrapeadas)
+    if (p.caracteristicas && Array.isArray(p.caracteristicas)) {
+      for (const spec of p.caracteristicas) {
+        if (!spec.nombre || !spec.valor) continue;
+        const c = charRepo.create({
+          nombre: spec.nombre,
+          valor: spec.valor,
+          productoId: saved.id,
+        });
+        await charRepo.save(c);
+      }
     }
 
     created++;
