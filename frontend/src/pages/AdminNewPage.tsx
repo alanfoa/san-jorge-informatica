@@ -1,16 +1,19 @@
 import type { Producto } from '@/types'
 import { ProductForm } from '@/components/ProductForm'
 import { useCreateProducto } from '@/hooks/queries'
+import { useToast } from '@/hooks/useToast'
 
 export function AdminNewPage() {
+  const { toast } = useToast()
   const createProducto = useCreateProducto()
-  const token = localStorage.getItem('admin_token')
+  const token = localStorage.getItem('admin_token') || sessionStorage.getItem('admin_token')
 
   async function handleSubmit(data: Partial<Producto>) {
     try {
       await createProducto.mutateAsync({ data, token: token! })
+      toast('success', 'Producto creado')
     } catch {
-      alert('Error al crear producto')
+      toast('error', 'Error al crear producto')
     }
   }
 

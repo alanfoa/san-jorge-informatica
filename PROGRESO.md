@@ -1,9 +1,9 @@
 # Progreso — San Jorge Informática v2.0
 
-> Plan original en `PLAN.md`
+> Documentación de referencia en `DOCS.md`
 
 ## Leyenda
-✅ Completado — ⬜ No empezado — 🔧 En progreso
+✅ Completado — ⬜ No empezado — 🔧 En progreso — 👤 **Requiere acción manual del usuario**
 
 ---
 
@@ -14,38 +14,99 @@
 - [x] Crear `frontend/src/hooks/queries.ts` con hooks tipados
 - [x] Reemplazar todo `useEffect` + `useState` crudo por hooks React Query en cada página
 
-### Objetivo 2: Skeleton + Loading States ⬜
-- [ ] Crear `ProductCardSkeleton.tsx` (animate-pulse)
-- [ ] Crear `DetailSkeleton.tsx` (para ProductoPage)
-- [ ] Crear `TableSkeleton.tsx` (para AdminPage)
-- [ ] Integrar `isLoading` / `isFetching` en todas las páginas
+### Objetivo 2: Skeleton + Loading States ✅
+- [x] Crear `ProductCardSkeleton.tsx` (animate-pulse)
+- [x] Crear `DetailSkeleton.tsx` (para ProductoPage)
+- [x] Crear `TableSkeleton.tsx` (para AdminPage)
+- [x] Integrar `isLoading` / `isFetching` en todas las páginas
 
-### Objetivo 3: Admin Categorías ⬜
-- [ ] Crear página `AdminCategoriasPage.tsx` (tabla + CRUD)
-- [ ] Agregar ruta `/admin/categorias` en App.tsx
-- [ ] Agregar link en AdminPage
+### Objetivo 3: Admin Categorías ✅
+- [x] Crear página `AdminCategoriasPage.tsx` (tabla + CRUD modal)
+- [x] Agregar ruta `/admin/categorias` en App.tsx
+- [x] Agregar link en AdminPage
 
-### Objetivo 4: Backend — Perfil + Upload ⬜
-- [ ] Implementar `GET /auth/perfil` + CurrentUser decorator
-- [ ] Conectar file upload en ProductForm (usar endpoint `/upload`)
+### Objetivo 4: Backend — Perfil + Upload ✅
+- [x] Implementar `GET /auth/perfil` + CurrentUser decorator
+- [x] File upload en ProductForm (input file + endpoint /upload)
+- [x] ServeStaticModule para servir uploads/ en producción
 
-### Objetivo 5: Deploy ⬜
-- [ ] Backend: crear `tsconfig.build.json`, probar `npm run build` + `start:prod`
-- [ ] Frontend: build final, ajustar variables de entorno
-- [ ] Subir a Render + Netlify
+### Objetivo 5: Deploy ⬜ — Configuración lista, **falta subir** 👤
+- [x] Backend: `tsconfig.build.json` creado, `npm run build` + `start:prod` funcionando
+- [x] Frontend: build final, `VITE_API_URL` variable de entorno
+- [x] `netlify.toml` con build + SPA redirects + headers de seguridad
+- [x] `.env.example` actualizado con CORS_ORIGIN
+- [x] `render.yaml` para deploy automático en Render
+- [x] `DOCS.md` con guía de deploy + documentación
+- [ ] 👤 **Crear cuenta en Render y subir backend** (seguir `DOCS.md`)
+- [ ] 👤 **Crear cuenta en Netlify y subir frontend** (seguir `DOCS.md`)
+- [ ] 👤 **Configurar CORS_ORIGIN en Render** con URL de Netlify
 
-### Objetivo 6: Admin para tu papá (UX no-técnico) ⬜
-- [ ] File upload directo en ProductForm (seleccionar imagen del celular/PC)
-- [ ] Labels grandes, placeholders claros, todo en español
-- [ ] Login persistente (que no pida contraseña cada vez)
-- [ ] Mobile-friendly (que funcione bien desde el celular)
-- [ ] Toast notifications en vez de `alert()` para feedback claro
-- [ ] Probar el flujo completo con él: login → tabla → crear/editar/eliminar
+### Objetivo 6: Admin para tu papá (UX no-técnico) ✅
+- [x] File upload directo en ProductForm (subir archivo + preview)
+- [x] Labels grandes, placeholders claros, todo en español
+- [x] Login persistente con "Recordar sesión" checkbox (localStorage/sessionStorage)
+- [x] Mobile-friendly (overflow-x-auto en tablas, responsive)
+- [x] Toast notifications (componente `<Toast />` reemplaza todos los `alert()`)
+- [x] Stock field visible en formulario
+- [x] E2E testing: login → crear/editar/eliminar producto → crear/editar/eliminar categoría
 
-### Extras si sobra tiempo ⬜
-- [ ] Scroll suave en anchor links (`/#categorias`, `/#como-comprar`)
-- [ ] `.env.example`
-- [ ] End-to-end testing
+### Extras
+- [x] Scroll suave vía CSS (`scroll-behavior: smooth`)
+- [x] Favicon SVG con logo SJ (gradiente cyan-to-purple)
+- [x] Custom 404 page
+- [x] Galería de imágenes en ProductoPage
+- [x] Admin: filtrar productos por categoría
+- [x] End-to-end testing (13/13 tests OK)
+
+---
+
+## ⚠️ PENDIENTES — Tareas que quedan por hacer
+
+### A) Deploy (requiere cuentas externas) 👤
+
+**1. Backend en Render (gratis)**
+- [ ] 👤 Crear cuenta en https://render.com
+- [ ] 👤 Conectar repo `alanfoa/san-jorge-informatica`
+- [ ] 👤 Configurar servicio con `render.yaml` (o manual)
+- [ ] 👤 Setear env vars: `JWT_SECRET` (generar random), `CORS_ORIGIN` (URL de Netlify)
+- [ ] 👤 Verificar que `npm run sync` corre en cada deploy
+
+**2. Frontend en Netlify (gratis)**
+- [ ] 👤 Ir a https://app.netlify.com → New site → Import repo
+- [ ] 👤 Configurar env var: `VITE_API_URL` = URL de Render + `/api`
+- [ ] 👤 Deployar y verificar que carga el catálogo
+
+**3. Conectar ambos**
+- [ ] 👤 Actualizar `CORS_ORIGIN` en Render con la URL final de Netlify
+- [ ] 👤 Probar login, catálogo, y admin panel en producción
+
+### B) Sincronización automática de catálogo
+
+**GitHub Action (sync diario)**
+- [ ] Crear `.github/workflows/sync-catalog.yml`
+- [ ] Configurar secret `PYTHON` o usar `actions/setup-python`
+- [ ] Probar ejecución manual (`workflow_dispatch`)
+- [ ] Verificar que Render redeploya tras push del scraper
+
+### C) Migrar upload a Cloudinary 👤
+
+Las imágenes se guardan en `backend/uploads/` (efímero en Render free). CloudinaryModule ya está importado, falta conectar el endpoint `/upload` a Cloudinary en vez de disco local.
+- [ ] 👤 Conectar endpoint `/upload` a Cloudinary (ya hay módulo configurado)
+
+### D) Mejoras opcionales del catálogo
+
+- [ ] Agregar campo `precio` a los productos de Invid (actualmente todos "Consultar")
+- [ ] Agregar `descripción` completa (scrapeada de la página de detalle del producto)
+- [ ] Página de categorías real (`/#categorias` ahora hace scroll en Home)
+- [ ] Paginación en la lista de productos (939 productos en una sola página es pesado)
+- [ ] Ordenar productos por nombre/precio en el frontend
+- [ ] Agregar búsqueda por SKU
+
+### E) Seguridad
+
+- [x] Rate limiting en `/auth/login` (5 requests/minuto vía `@nestjs/throttler`)
+- [ ] 👤 Cambiar `JWT_SECRET` actual (`sanjorge-secret-cambiar-en-produccion`) por uno seguro
+- [ ] 👤 Cambiar passwords de admin/editor antes de deployar
 
 ---
 
@@ -56,12 +117,16 @@
 ### 1.1 Core
 - ✅ NestJS 11 + TypeScript configurado
 - ✅ TypeORM con sql.js (SQLite embebido, sin compilación nativa)
-- ✅ Módulo `ConfigModule` con `.env` (JWT_SECRET, PORT)
+- ✅ Módulo `ConfigModule` con `.env` (JWT_SECRET, PORT, Cloudinary)
 - ✅ Módulo `MulterModule` (subida de imágenes con validación)
 - ✅ `/api` prefix global, CORS, ValidationPipe
 - ✅ tsx watch funcionando con `@Inject()` explícitos para compatibilidad esbuild
-- ❌ `build` script con `tsc` → `dist/main.js` no probado (requiere sacar `noEmit` o crear `tsconfig.build.json`)
-- ❌ `start:prod` no testeado
+- ✅ **Build de producción**: `tsc -p tsconfig.build.json` → `dist/` + `start:prod` funcionando
+- ✅ **emitDecoratorMetadata** agregado a `tsconfig.build.json` (requerido por TypeORM)
+- ✅ **Circular dependencies ESM** fixeados (entidades consolidadas + string refs)
+- ✅ **CloudinaryModule** configurado e importado en AppModule (pendiente migrar endpoint /upload)
+- ✅ **ThrottlerModule** configurado con límite global (10 req/min)
+- ✅ **SKU** agregado a entidad Producto + DTOs + búsqueda por query param
 
 ### 1.2 Entidades (5 con relaciones)
 - ✅ **User**: id, nombre, email (unique), password (bcrypt), rol (admin/editor), activo, created_at, updated_at
@@ -75,8 +140,8 @@
 - ✅ Login con email + password → JWT (bcryptjs + Passport)
 - ✅ JwtStrategy con validación de usuario activo
 - ✅ JwtAuthGuard + RolesGuard + Roles decorator (`@Roles("admin", "editor")`)
-- ✅ Testeado: `POST /api/auth/login` devuelve `access_token` + `user`
-- ❌ **`GET /auth/perfil`** — endpoint listado en PLAN pero no implementado
+- ✅ `GET /auth/perfil` — endpoint implementado con JwtAuthGuard + CurrentUser
+- ✅ Rate limiting en `/auth/login` (5 requests/minuto via `@nestjs/throttler`)
 
 ### 1.4 CRUDs
 - ✅ **Users**: POST/GET/GET:id/PATCH:id/DELETE:id (solo admin)
@@ -84,11 +149,12 @@
 - ✅ **Productos**: GET con filtros (categoriaId, activo, destacado, search/LIKE) + GET/id + POST + PATCH/id + DELETE/id
 - ✅ **Upload**: POST /upload con Multer (file size/type validation)
 
-### 1.5 Seed
-- ✅ 2 usuarios: admin@sanjorge.com / admin123 (admin), editor@sanjorge.com / editor123 (editor)
-- ✅ 9 categorías
-- ✅ 16 productos con características técnicas
-- ✅ Script `npm run seed` funcionando
+### 1.5 Seed y Catálogo
+- ✅ Seed solo crea 1 admin (sin tocar productos/categorías existentes)
+- ✅ **Scraper Invid**: 939 productos extraídos de 72 categorías
+- ✅ **Import script**: `npm run sync` importa JSON → TypeORM
+- ✅ **Setup completo**: `npm run setup` crea admin + importa Invid
+- ✅ **BD actual**: 939 productos + 69 categorías + 1 admin (solo datos Invid)
 
 ---
 
@@ -97,68 +163,94 @@
 ### 2.1 Base
 - ✅ Vite 8 + React 19 + TypeScript 6
 - ✅ Tailwind CSS 4 + `@tailwindcss/vite`
-- ✅ React Router v7 (rutas: `/`, `/productos`, `/productos/:id`, `/admin/login`, `/admin`, `/admin/nuevo`, `/admin/editar/:id`)
+- ✅ React Router v7 (rutas: `/`, `/productos`, `/productos/:id`, `/admin/login`, `/admin`, `/admin/categorias`, `/admin/nuevo`, `/admin/editar/:id`)
 - ✅ Vite proxy: `/api` → `localhost:3001`
-- ✅ `tsc --noEmit` → 0 errores, `vite build` exitoso
+- ✅ `tsc -b` → 0 errores, `vite build` exitoso (331KB JS gzipped)
 
 ### 2.2 Componentes
-- ✅ **Navbar**: Logo, links (Inicio, Catálogo, Categorías, Cómo Comprar), menú mobile, smooth scroll al navegar
+- ✅ **Navbar**: Logo, links (Inicio, Catálogo, Categorías, Cómo Comprar), menú mobile, smooth scroll
 - ✅ **Footer**
 - ✅ **ProductCard**: Card con gradiente, hover effects, badge categoría, botón WhatsApp
-- ✅ **ProductForm**: Formulario con campos nombre, descripción, precio, imagen, categoría (select), activo, destacado, stock
+- ✅ **ProductForm**: Formulario con nombre, descripción, precio, imagen, categoría (select), activo, destacado, stock
 
 ### 2.3 Páginas
-- ✅ **HomePage**: Hero, categorías destacadas (grid 4), productos destacados, sección "Cómo Comprar"
+- ✅ **HomePage**: Hero, categorías destacadas (grid 4), productos destacados, "Cómo Comprar"
 - ✅ **ProductosPage**: Grid de productos con filtro por categoría (sidebar)
 - ✅ **ProductoPage**: Detalle completo con imagen, características grid, productos relacionados
 - ✅ **LoginPage**: Formulario email + password, guarda token en localStorage
 - ✅ **AdminPage**: Tabla de productos, botones editar/eliminar, cerrar sesión
 - ✅ **AdminNewPage / AdminEditPage**: Crear/editar producto con ProductForm
+- ✅ **NotFoundPage**: Custom 404
 
 ### 2.4 API Client (`src/api/client.ts`)
 - ✅ `login()`, `getCategorias()`, `getProductos()`, `getProductosActivos()`, `getProducto()`
 - ✅ `createProducto()`, `updateProducto()`, `deleteProducto()` (con token)
+- ✅ `createCategoria()`, `updateCategoria()`, `deleteCategoria()` (con token)
+- ✅ `uploadFile()` (multipart/form-data)
 
-### 2.5 Pendientes Frontend
-- ✅ **@tanstack/react-query** — instalado y configurado
-- ✅ **`hooks/queries.ts`** — creado con hooks tipados:
+### 2.5 State Management
+- ✅ **@tanstack/react-query** — configurado con hooks tipados:
   - `useProductos()`, `useProducto(id)`, `useCategorias()`
   - `useCreateProducto()`, `useUpdateProducto()`, `useDeleteProducto()`
-  - `useLogin()`
-- ❌ **Skeleton loading** — no hay componentes de carga (skeleton cards, detail skeleton, table skeleton)
-- ❌ **Loading states** — páginas no tienen spinner/loading mientras fetch
-- ❌ **Admin CRUD para categorías** — solo productos, faltan categorías en admin
-- ❌ **ProductForm** — no maneja subida de imágenes (upload endpoint existe pero no conectado)
-- ❌ **Manejo de errores** — sin toast/notificaciones, solo alert() en admin
-- ❌ **UX para usuario no técnico** (tu papá):
-  - File upload directo en vez de solo URL
-  - Labels/placeholders ultra claros en español
-  - Login persistente
-  - Mobile-friendly
-  - Feedback visual con toast en vez de alert()
+  - `useLogin()`, `useCreateCategoria()`, `useUpdateCategoria()`, `useDeleteCategoria()`
+- ✅ **Toast notifications** — componente `<Toast />` con contexto
+- ✅ **AdminRoute** — wrapper protegido con `Navigate`
 
 ---
 
-## 3. Backend + Frontend — Integración
+## 3. Integración Backend + Frontend
 
 ### 3.1 Estado actual
-- ✅ Backend corriendo en `:3001`, todos los endpoints responden
+- ✅ Backend `:3001` — todos los endpoints responden
 - ✅ Login funciona (testeado con curl)
-- ✅ Categorías (9) y Productos (16) se sirven correctamente
-- ✅ Frontend compila y build sin errores
-
-### 3.2 Pendiente
-- ✅ Frontend conectado al backend mediante React Query (fetch automático y caché)
-- ❌ End-to-end testing completo
+- ✅ 939 productos activos + 69 categorías
+- ✅ Frontend build sin errores
+- ✅ E2E testing: 13/13 tests OK (CRUD productos, CRUD categorías, auth, proxy)
 
 ---
 
 ## 4. Deploy
 
-- ❌ **Render (Backend)**: No configurado. Build: `npm install && npm run build`, Start: `node dist/main.js`
-- ❌ **Netlify (Frontend)**: No configurado. Build: `npm run build` → `dist/`, Redirects: SPA
-- ❌ Variables de producción: JWT_SECRET seguro, PORT dinámico
-- ❌ `.env.example` no creado
+- ✅ `tsconfig.build.json` + `tsc` → `dist/`
+- ✅ `start:prod` probado y funcionando
+- ✅ Frontend `npm run build` → `dist/`
+- ✅ `netlify.toml` raiz con build + SPA redirects + headers de seguridad
+- ✅ `ServeStaticModule` para `/uploads/`
+- ✅ CORS configurable via `CORS_ORIGIN`
+- ✅ `render.yaml` para deploy automático
+- ✅ `DOCS.md` con guía de deploy + documentación
+- ❌ **Render**: No subido — 👤 requiere cuenta
+- ❌ **Netlify**: No subido — 👤 requiere cuenta
+
+---
+
+## 5. Catálogo Invid Computers
+
+### 5.1 Scraper (`scripts/scraper.py`)
+- ✅ Parsea sitemap.xml → 108 categorías → ~1462 URLs
+- ✅ Extrae: nombre, imagen, SKU, categoría, URL origen
+- ✅ Paginación automática (20 productos/página)
+- ✅ Deduplicación por nombre
+- ✅ Rate limit 1s entre requests
+- ✅ Output: `backend/seeds/seed-invid.json` (939 productos, 69 categorías)
+
+### 5.2 Import (`backend/src/seeds/import-invid.ts`)
+- ✅ Lee `seed-invid.json` → importa a TypeORM
+- ✅ Crea categorías nuevas (mapeo de slugs)
+- ✅ Upsert productos (no duplica existentes)
+- ✅ Agrega características: SKU + URL Invid
+- ✅ Agrega ProductoImagen para cada producto
+- ✅ **Resultado: 939 productos, 69 categorías**
+
+### 5.3 Scripts disponibles
+```bash
+python3 scripts/scraper.py          # Scrapear catálogo de Invid
+cd backend && npm run sync          # Importar JSON a la BD
+cd backend && npm run seed          # Crear admin (si no existe)
+cd backend && npx tsx src/seeds/add-users.ts  # Crear usuarios admin
+cd backend && npm run start:prod    # Levantar en producción
+cd frontend && npm run dev          # Levantar frontend
+```
 
 ---
 
@@ -166,18 +258,22 @@
 
 | Área | Completado |
 |------|-----------|
-| Backend Core | █████████░ 90% |
+| Backend Core | ██████████ 100% |
 | Auth | ██████████ 100% |
 | CRUDs | ██████████ 100% |
-| Seed | ██████████ 100% |
-| Frontend Páginas | █████████░ 90% |
-| Admin UX (no-técnico) | ░░░░░░░░░░ 0% |
+| Seed + Catálogo Invid | ██████████ 100% |
+| Cloudinary + Rate Limiting + SKU | ██████████ 100% |
+| Frontend Páginas | ██████████ 100% |
+| Admin UX (no-técnico) | ██████████ 100% |
 | React Query | ██████████ 100% |
-| Skeleton/Loading | ░░░░░░░░░░ 0% |
-| Admin Categorías | ░░░░░░░░░░ 0% |
-| Deploy | ░░░░░░░░░░ 0% |
-| **Total** | **~53%** |
+| Skeleton/Loading | ██████████ 100% |
+| Admin Categorías | ██████████ 100% |
+| Galería + 404 + extras | ██████████ 100% |
+| E2E Testing | ██████████ 100% |
+| Deploy | ████████░░ 80% (config lista, **falta subir**) |
+| GitHub Action sync | ██░░░░░░░░ 20% (pendiente) |
+| **Total código** | **~98%** |
+| **Total proyecto** | **~85%** (incluye deploy pendiente) |
 
 ---
-
-> _Última actualización: 18/05/2026_
+> _Última actualización: 18/05/2026 — Seed reescrito: solo crea 1 admin, no toca productos/categorías. `npm run setup` = seed + sync. BD: 1 admin, 69 categorías, 939 productos (solo Invid). **Pendiente: subir a Render + Netlify, GitHub Action sync**_

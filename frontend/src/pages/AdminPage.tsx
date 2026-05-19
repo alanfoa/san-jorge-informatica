@@ -1,10 +1,18 @@
-import { useNavigate, Link } from 'react-router-dom'
+import { useNavigate, Link, useSearchParams } from 'react-router-dom'
+import { TableSkeleton } from '@/components/TableSkeleton'
 import { useProductos, useDeleteProducto } from '@/hooks/queries'
+import { useToast } from '@/hooks/useToast'
 
 export function AdminPage() {
   const navigate = useNavigate()
-  const token = localStorage.getItem('admin_token')
-  const { data: productos = [] } = useProductos()
+  const [searchParams] = useSearchParams()
+  const { toast } = useToast()
+  const token = localStorage.getItem('admin_token') || sessionStorage.getItem('admin_token')
+  const { data: allProductos = [], isLoading } = useProductos()
+  const categoriaFiltro = searchParams.get('categoriaId')
+  const productos = categoriaFiltro
+    ? allProductos.filter(p => p.categoriaId === Number(categoriaFiltro))
+    : allProductos
   const deleteProducto = useDeleteProducto()
 
   if (!token) {
@@ -14,13 +22,18 @@ export function AdminPage() {
 
   async function handleDelete(id: number) {
     if (!confirm('¿Eliminar producto?')) return
+    if (!token) return
     try {
-      await deleteProducto.mutateAsync({ id, token: token! })
-    } catch { alert('Error al eliminar') }
+      await deleteProducto.mutateAsync({ id, token })
+      toast('success', 'Producto eliminado')
+    } catch {
+      toast('error', 'Error al eliminar producto')
+    }
   }
 
   function handleLogout() {
     localStorage.removeItem('admin_token')
+    sessionStorage.removeItem('admin_token')
     navigate('/admin/login')
   }
 
@@ -28,13 +41,24 @@ export function AdminPage() {
     <div className="min-h-screen bg-black pt-20">
       <div className="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8 py-8">
         <div className="flex items-center justify-between mb-8">
-          <h1 className="text-2xl font-bold text-white">Administración</h1>
+          <div className="flex items-center gap-4">
+            <h1 className="text-2xl font-bold text-white">Administración</h1>
+            {categoriaFiltro && (
+              <Link to="/admin" className="text-sm text-cyan-400 hover:text-cyan-300 transition-colors">
+                Mostrar todos
+              </Link>
+            )}
+          </div>
           <div className="flex gap-3">
+            <Link to="/admin/categorias" className="px-4 py-2 bg-gray-800 text-white rounded-lg text-sm font-medium hover:bg-gray-700 transition-all">Categorías</Link>
             <Link to="/admin/nuevo" className="px-4 py-2 bg-gradient-to-r from-cyan-500 to-purple-600 text-white rounded-lg text-sm font-medium shadow-lg shadow-cyan-500/50 hover:shadow-cyan-500/80 transition-all">Nuevo producto</Link>
             <button onClick={handleLogout} className="text-sm text-gray-400 hover:text-cyan-400 transition-colors">Cerrar sesión</button>
           </div>
         </div>
 
+        {isLoading ? (
+          <TableSkeleton />
+        ) : (
         <div className="overflow-x-auto rounded-xl border border-cyan-500/20">
           <table className="w-full text-sm">
             <thead>
@@ -67,6 +91,7 @@ export function AdminPage() {
             </tbody>
           </table>
         </div>
+        )}
       </div>
     </div>
   )

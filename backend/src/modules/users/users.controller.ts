@@ -1,5 +1,6 @@
 import {
-  Controller, Get, Post, Patch, Delete, Body, Param, ParseIntPipe, Inject,
+  Controller, Get, Post, Patch, Delete, Body, Param, ParseIntPipe,
+  Inject, UseGuards,
 } from "@nestjs/common";
 import { UsersService } from "./users.service.js";
 import { CreateUserDto } from "./dto/create-user.dto.js";
@@ -9,6 +10,7 @@ import { RolesGuard } from "../../common/guards/roles.guard.js";
 import { Roles } from "../../common/guards/roles.decorator.js";
 
 @Controller("users")
+@UseGuards(JwtAuthGuard, RolesGuard)
 @Roles("admin")
 export class UsersController {
   constructor(@Inject(UsersService) private usersService: UsersService) {}

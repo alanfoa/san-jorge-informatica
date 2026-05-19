@@ -1,7 +1,6 @@
 import {
   Entity, PrimaryGeneratedColumn, Column, CreateDateColumn, UpdateDateColumn, OneToMany,
 } from "typeorm";
-import { Producto } from "../../productos/entities/producto.entity.js";
 
 @Entity("categorias")
 export class Categoria {
@@ -20,7 +19,7 @@ export class Categoria {
   @Column("varchar", { nullable: true })
   imagen: string;
 
-  @OneToMany(() => Producto, (p) => p.categoria)
+  @OneToMany("Producto", "categoria")
   productos: Producto[];
 
   @CreateDateColumn()
@@ -28,4 +27,9 @@ export class Categoria {
 
   @UpdateDateColumn()
   updated_at: Date;
+}
+
+export interface Producto {
+  id: number;
+  categoria: Categoria;
 }

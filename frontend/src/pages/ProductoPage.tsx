@@ -1,7 +1,9 @@
+import { useState } from 'react'
 import { useParams, Link } from 'react-router-dom'
 import { ProductCard } from '@/components/ProductCard'
+import { DetailSkeleton } from '@/components/DetailSkeleton'
 import { useProducto, useProductosActivos } from '@/hooks/queries'
-import { MessageCircle, ArrowLeft, Check, Info } from 'lucide-react'
+import { MessageCircle, ArrowLeft, Check, Info, ChevronLeft, ChevronRight } from 'lucide-react'
 import { WHATSAPP } from '@/lib/constants'
 
 export function ProductoPage() {
@@ -9,12 +11,30 @@ export function ProductoPage() {
   const productoId = id ? Number(id) : undefined
   const { data: p, isLoading, isError } = useProducto(productoId)
   const { data: todos = [] } = useProductosActivos()
+  const [imgIdx, setImgIdx] = useState(0)
 
   const relacionados = todos.filter(
     r => r.categoria?.slug === p?.categoria?.slug && r.id !== p?.id
   ).slice(0, 4)
 
-  if (isLoading) return <div className="min-h-screen bg-black pt-20 flex items-center justify-center"><p className="text-gray-400">Cargando...</p></div>
+  const galeria: string[] = p ? [
+    p.imagen,
+    ...(p.imagenes?.map(i => i.url) ?? []),
+  ].filter((u): u is string => !!u).filter((url, i, arr) => arr.indexOf(url) === i) : []
+
+  const imagenActual = galeria[imgIdx] ?? null
+
+  function prevImg() {
+    if (galeria.length <= 1) return
+    setImgIdx(i => (i - 1 + galeria.length) % galeria.length)
+  }
+
+  function nextImg() {
+    if (galeria.length <= 1) return
+    setImgIdx(i => (i + 1) % galeria.length)
+  }
+
+  if (isLoading) return <DetailSkeleton />
   if (isError || !p) return (
     <div className="min-h-screen bg-black pt-20 flex items-center justify-center">
       <div className="text-center">
@@ -37,20 +57,53 @@ export function ProductoPage() {
         </div>
 
         <div className="grid grid-cols-1 lg:grid-cols-2 gap-12 mb-20">
-          <div className="relative">
-            <div className="aspect-square rounded-2xl overflow-hidden bg-gray-900 border border-cyan-500/20">
-              {p.imagen ? (
-                <img src={p.imagen} alt={p.nombre} className="w-full h-full object-cover" />
+          <div className="space-y-4">
+            <div className="relative aspect-square rounded-2xl overflow-hidden bg-gray-900 border border-cyan-500/20 group">
+              {imagenActual ? (
+                <img src={imagenActual} alt={p.nombre} className="w-full h-full object-cover transition-all duration-300" />
               ) : (
                 <div className="w-full h-full flex items-center justify-center text-gray-500">Sin imagen</div>
               )}
+              <div className="absolute top-4 left-4 z-10">
+                <span className="px-4 py-2 bg-green-500/90 text-white text-sm font-bold uppercase tracking-wide rounded-lg shadow-lg flex items-center gap-2">
+                  <Check className="w-4 h-4" />
+                  {p.stock > 0 ? 'En Stock' : 'Consultar'}
+                </span>
+              </div>
+              {galeria.length > 1 && (
+                <>
+                  <button
+                    onClick={prevImg}
+                    className="absolute left-3 top-1/2 -translate-y-1/2 w-10 h-10 bg-black/60 rounded-full flex items-center justify-center text-white hover:bg-black/80 transition-all opacity-0 group-hover:opacity-100"
+                  >
+                    <ChevronLeft className="w-5 h-5" />
+                  </button>
+                  <button
+                    onClick={nextImg}
+                    className="absolute right-3 top-1/2 -translate-y-1/2 w-10 h-10 bg-black/60 rounded-full flex items-center justify-center text-white hover:bg-black/80 transition-all opacity-0 group-hover:opacity-100"
+                  >
+                    <ChevronRight className="w-5 h-5" />
+                  </button>
+                </>
+              )}
             </div>
-            <div className="absolute top-6 left-6">
-              <span className="px-4 py-2 bg-green-500/90 text-white text-sm font-bold uppercase tracking-wide rounded-lg shadow-lg flex items-center gap-2">
-                <Check className="w-4 h-4" />
-                {p.stock > 0 ? 'En Stock' : 'Consultar'}
-              </span>
-            </div>
+            {galeria.length > 1 && (
+              <div className="flex gap-2 overflow-x-auto pb-2">
+                {galeria.map((url, i) => (
+                  <button
+                    key={i}
+                    onClick={() => setImgIdx(i)}
+                    className={`w-20 h-20 rounded-lg overflow-hidden border-2 flex-shrink-0 transition-all ${
+                      i === imgIdx
+                        ? 'border-cyan-400 ring-1 ring-cyan-400'
+                        : 'border-cyan-500/20 hover:border-cyan-500/50'
+                    }`}
+                  >
+                    <img src={url} alt="" className="w-full h-full object-cover" />
+                  </button>
+                ))}
+              </div>
+            )}
           </div>
 
           <div className="space-y-6">

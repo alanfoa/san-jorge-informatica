@@ -2,9 +2,6 @@ import {
   Entity, PrimaryGeneratedColumn, Column, CreateDateColumn, UpdateDateColumn,
   ManyToOne, JoinColumn, OneToMany,
 } from "typeorm";
-import { Categoria } from "../../categorias/entities/categoria.entity.js";
-import { ProductoImagen } from "./producto-imagen.entity.js";
-import { Caracteristica } from "./caracteristica.entity.js";
 
 @Entity("productos")
 export class Producto {
@@ -16,6 +13,9 @@ export class Producto {
 
   @Column("text", { nullable: true })
   descripcion: string;
+
+  @Column("varchar", { unique: true, nullable: true })
+  sku: string;
 
   @Column("decimal", { precision: 10, scale: 2 })
   precio: number;
@@ -32,7 +32,7 @@ export class Producto {
   @Column("int", { default: 0 })
   stock: number;
 
-  @ManyToOne(() => Categoria, (c) => c.productos)
+  @ManyToOne("Categoria", "productos")
   @JoinColumn({ name: "categoriaId" })
   categoria: Categoria;
 
@@ -50,4 +50,47 @@ export class Producto {
 
   @UpdateDateColumn()
   updated_at: Date;
+}
+
+export interface Categoria {
+  id: number;
+  productos: Producto[];
+}
+
+@Entity("producto_imagenes")
+export class ProductoImagen {
+  @PrimaryGeneratedColumn()
+  id: number;
+
+  @Column("varchar")
+  url: string;
+
+  @Column("int", { default: 0 })
+  orden: number;
+
+  @ManyToOne(() => Producto, (p) => p.imagenes)
+  @JoinColumn({ name: "productoId" })
+  producto: Producto;
+
+  @Column("int")
+  productoId: number;
+}
+
+@Entity("caracteristicas")
+export class Caracteristica {
+  @PrimaryGeneratedColumn()
+  id: number;
+
+  @Column("varchar")
+  nombre: string;
+
+  @Column("varchar")
+  valor: string;
+
+  @ManyToOne(() => Producto, (p) => p.caracteristicas)
+  @JoinColumn({ name: "productoId" })
+  producto: Producto;
+
+  @Column("int")
+  productoId: number;
 }

@@ -5,9 +5,12 @@ import { HomePage } from '@/pages/HomePage'
 import { ProductosPage } from '@/pages/ProductosPage'
 import { ProductoPage } from '@/pages/ProductoPage'
 import { LoginPage } from '@/pages/LoginPage'
+import { NotFoundPage } from '@/pages/NotFoundPage'
 import { AdminPage } from '@/pages/AdminPage'
+import { AdminCategoriasPage } from '@/pages/AdminCategoriasPage'
 import { AdminNewPage } from '@/pages/AdminNewPage'
 import { AdminEditPage } from '@/pages/AdminEditPage'
+import { AdminRoute } from '@/components/AdminRoute'
 
 export default function App() {
   return (
@@ -18,9 +21,13 @@ export default function App() {
         <Route path="/productos" element={<ProductosPage />} />
         <Route path="/productos/:id" element={<ProductoPage />} />
         <Route path="/admin/login" element={<LoginPage />} />
-        <Route path="/admin" element={<AdminPage />} />
-        <Route path="/admin/nuevo" element={<AdminNewPage />} />
-        <Route path="/admin/editar/:id" element={<AdminEditPage />} />
+        <Route element={<AdminRoute />}>
+          <Route path="/admin" element={<AdminPage />} />
+          <Route path="/admin/categorias" element={<AdminCategoriasPage />} />
+          <Route path="/admin/nuevo" element={<AdminNewPage />} />
+          <Route path="/admin/editar/:id" element={<AdminEditPage />} />
+        </Route>
+        <Route path="*" element={<NotFoundPage />} />
       </Routes>
       <Footer />
     </>

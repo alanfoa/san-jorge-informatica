@@ -18,13 +18,15 @@ export class ProductosController {
     @Query("categoriaId") categoriaId?: string,
     @Query("activo") activo?: string,
     @Query("destacado") destacado?: string,
-    @Query("search") search?: string
+    @Query("search") search?: string,
+    @Query("sku") sku?: string // Añadir el parámetro sku
   ) {
     return this.productosService.findAll({
       categoriaId: categoriaId ? Number(categoriaId) : undefined,
       activo: activo !== undefined ? activo === "true" : undefined,
       destacado: destacado !== undefined ? destacado === "true" : undefined,
       search,
+      sku, // Pasar el parámetro sku al servicio
     });
   }
 

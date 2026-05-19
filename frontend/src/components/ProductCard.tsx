@@ -37,7 +37,7 @@ export function ProductCard({ producto }: ProductCardProps) {
         </div>
 
         <Link to={`/productos/${producto.id}`}>
-          <h3 className="text-white font-semibold leading-tight hover:text-cyan-400 transition-colors line-clamp-2 min-h-[3rem]">
+          <h3 className="text-white font-semibold leading-tight hover:text-cyan-400 transition-colors break-words">
             {producto.nombre}
           </h3>
         </Link>

@@ -17,17 +17,24 @@ export class ProductosService {
     activo?: boolean;
     destacado?: boolean;
     search?: string;
+    sku?: string;
   }) {
     const where: any = {};
     if (query?.categoriaId) where.categoriaId = query.categoriaId;
     if (query?.activo !== undefined) where.activo = query.activo;
     if (query?.destacado !== undefined) where.destacado = query.destacado;
-    if (query?.search) where.nombre = Like(`%${query.search}%`);
+
+    // Lógica para búsqueda por nombre o SKU
+    if (query?.search) {
+      where.nombre = Like(`%${query.search}%`);
+    } else if (query?.sku) {
+      where.sku = Like(`%${query.sku}%`);
+    }
 
     return this.productosRepository.find({
       where,
       relations: ["categoria", "imagenes", "caracteristicas"],
-      order: { created_at: "DESC" },
+      order: { created_at: "DESC" }, // Ordenar por fecha de creación descendente
     });
   }
 
