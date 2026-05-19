@@ -20,7 +20,7 @@ export function ProductoPage() {
   const galeria: string[] = p ? [
     p.imagen,
     ...(p.imagenes?.map(i => i.url) ?? []),
-  ].filter((u): u is string => !!u) : []
+  ].filter((u): u is string => !!u).filter((url, i, arr) => arr.indexOf(url) === i) : []
 
   const imagenActual = galeria[imgIdx] ?? null
 
