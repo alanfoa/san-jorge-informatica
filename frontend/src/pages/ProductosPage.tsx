@@ -7,28 +7,96 @@ import { Search, Filter, X, ChevronLeft, ChevronRight, ChevronDown } from 'lucid
 
 const ITEMS_PER_PAGE = 24
 
-const GRUPOS: Record<string, string> = {
-  'placas de video': 'Placas de Video',
-  'discos rigidos ssd': 'Almacenamiento',
-  'microprocesadores': 'Procesadores',
-  'mothers': 'Motherboards',
-  'monitores': 'Monitores',
-  'conectividad': 'Conectividad',
-  'consumibles': 'Consumibles',
-  'perifericos': 'Periféricos',
-  'gabinetes y fuentes': 'Gabinetes y Fuentes',
-  'gamers': 'Gamers',
-  'computadoras': 'Computadoras',
-  'coolers': 'Coolers',
-  'impresoras': 'Impresoras',
-}
+const GRUPOS: [string, string][] = [
+  ['streaming', 'Gamers'],
+  ['accesorios gamer', 'Gamers'],
+  ['sillas y escritorios', 'Gamers'],
+  ['teclados gamers', 'Gamers'],
+  ['gamers', 'Gamers'],
 
-function getGrupo(nombre: string): string | null {
+  ['placas de video', 'Placas de Video'],
+
+  ['carry disk', 'Almacenamiento'],
+  ['disco rigido externo', 'Almacenamiento'],
+  ['disco ssd m2', 'Almacenamiento'],
+  ['disco ssd', 'Almacenamiento'],
+  ['almacenamiento', 'Almacenamiento'],
+
+  ['microprocesador', 'Procesadores'],
+  ['procesador', 'Procesadores'],
+
+  ['plataforma', 'Motherboards'],
+  ['mothers', 'Motherboards'],
+
+  ['monitor corporativo', 'Monitores'],
+  ['monitor consumo', 'Monitores'],
+  ['monitor gamer', 'Monitores'],
+  ['monitores', 'Monitores'],
+
+  ['watercoolers', 'Coolers'],
+  ['coolers', 'Coolers'],
+
+  ['multifuncion', 'Impresoras'],
+  ['ink jet', 'Impresoras'],
+  ['impresoras', 'Impresoras'],
+
+  ['tintas', 'Consumibles'],
+  ['cartuchos', 'Consumibles'],
+  ['consumibles hp', 'Consumibles'],
+  ['consumibles', 'Consumibles'],
+
+  ['web cam', 'Periféricos'],
+  ['mousepads', 'Periféricos'],
+  ['microfonos', 'Periféricos'],
+  ['parlantes', 'Periféricos'],
+  ['teclado mouse', 'Periféricos'],
+  ['mouse', 'Periféricos'],
+  ['teclados', 'Periféricos'],
+  ['perifericos', 'Periféricos'],
+
+  ['all in one', 'Computadoras'],
+  ['pc computadoras', 'Computadoras'],
+  ['computadoras', 'Computadoras'],
+
+  ['gabinetes con fuente', 'Gabinetes y Fuentes'],
+  ['gabinetes sin fuente', 'Gabinetes y Fuentes'],
+  ['fuentes de alimentacion', 'Gabinetes y Fuentes'],
+  ['gabinetes', 'Gabinetes y Fuentes'],
+
+  ['switches administrables', 'Conectividad'],
+  ['switches no administrables', 'Conectividad'],
+  ['access point', 'Conectividad'],
+  ['placas de red ethernet', 'Conectividad'],
+  ['placas de red wifi pci', 'Conectividad'],
+  ['placas de red wifi usb', 'Conectividad'],
+  ['modem adsl', 'Conectividad'],
+  ['router wireless', 'Conectividad'],
+  ['poe power over ethernet', 'Conectividad'],
+  ['media conv', 'Conectividad'],
+  ['camaras ip', 'Conectividad'],
+  ['accesorios bluetooth', 'Conectividad'],
+  ['smart home', 'Conectividad'],
+  ['de red cables', 'Conectividad'],
+  ['router', 'Conectividad'],
+  ['conectividad', 'Conectividad'],
+
+  ['papel resma', 'Papel y Varios'],
+  ['destacados', 'Destacados'],
+  ['electrodomesticos', 'Electrodomésticos'],
+  ['energia', 'Energía'],
+  ['memorias ram', 'Memorias Ram'],
+  ['notebooks', 'Notebooks'],
+  ['proyectores', 'Proyectores'],
+  ['super ofertas', 'Super Ofertas'],
+  ['tablets', 'Tablets'],
+]
+
+function getGrupo(nombre: string): string {
   const n = nombre.toLowerCase()
-  for (const [keyword, grupo] of Object.entries(GRUPOS)) {
+  for (const [keyword, grupo] of GRUPOS) {
     if (n.includes(keyword)) return grupo
   }
-  return null
+  return nombre
 }
 
 export function ProductosPage() {
@@ -63,21 +131,17 @@ export function ProductosPage() {
 
   const categoriasAgrupadas = useMemo(() => {
     const grupos = new Map<string, typeof categorias>()
-    const sueltas: typeof categorias = []
     for (const cat of categorias) {
       const grupo = getGrupo(cat.nombre)
-      if (grupo) {
-        if (!grupos.has(grupo)) grupos.set(grupo, [])
-        grupos.get(grupo)!.push(cat)
-      } else {
-        sueltas.push(cat)
-      }
+      if (!grupos.has(grupo)) grupos.set(grupo, [])
+      grupos.get(grupo)!.push(cat)
     }
-    const entradas = [...grupos.entries()].map(([nombre, cats]) => ({
-      nombre,
-      items: cats.sort((a, b) => a.nombre.localeCompare(b.nombre)),
-    })).sort((a, b) => a.nombre.localeCompare(b.nombre))
-    return { grupos: entradas, sueltas: sueltas.sort((a, b) => a.nombre.localeCompare(b.nombre)) }
+    return [...grupos.entries()]
+      .map(([nombre, items]) => ({
+        nombre,
+        items: items.sort((a, b) => a.nombre.localeCompare(b.nombre)),
+      }))
+      .sort((a, b) => a.nombre.localeCompare(b.nombre))
   }, [categorias])
 
   const totalPaginas = Math.max(1, Math.ceil(productosFiltrados.length / ITEMS_PER_PAGE))
@@ -206,7 +270,7 @@ export function ProductosPage() {
                 </button>
               </div>
               <div className="space-y-2">
-                {categoriasAgrupadas.grupos.map((grupo) => {
+                {categoriasAgrupadas.map((grupo) => {
                   const abierto = gruposAbiertos.has(grupo.nombre)
                   return (
                     <div key={grupo.nombre}>
@@ -243,20 +307,6 @@ export function ProductosPage() {
                     </div>
                   )
                 })}
-                {categoriasAgrupadas.sueltas.map((cat) => (
-                  <label key={cat.id} className="flex items-center gap-3 text-gray-300 hover:text-white cursor-pointer group py-0.5">
-                    <input
-                      type="checkbox"
-                      checked={categoriasSeleccionadas.includes(cat.slug)}
-                      onChange={() => toggleCategoria(cat.slug)}
-                      className="w-3.5 h-3.5 rounded border-cyan-500/30 bg-gray-800 text-cyan-500 focus:ring-cyan-500/50 focus:ring-2"
-                    />
-                    <span className="text-sm group-hover:text-cyan-400 transition-colors">{cat.nombre}</span>
-                    <span className="text-xs text-gray-500 ml-auto">
-                      ({productos.filter((p) => p.categoria?.slug === cat.slug).length})
-                    </span>
-                  </label>
-                ))}
               </div>
             </div>
           )}
