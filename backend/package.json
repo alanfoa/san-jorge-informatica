@@ -9,6 +9,7 @@
     "start:prod": "node dist/main.js",
     "seed": "tsx src/seeds/seed.ts",
     "seed:prod": "node dist/seeds/seed.js",
+    "sync:prod": "node dist/seeds/import-invid.js",
     "sync": "tsx src/seeds/import-invid.ts",
     "setup": "tsx src/seeds/seed.ts && tsx src/seeds/import-invid.ts",
     "typeorm": "typeorm-ts-node-commonjs",
