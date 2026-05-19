@@ -99,6 +99,82 @@ function getGrupo(nombre: string): string {
   return nombre
 }
 
+const CLEAN_NAMES: Record<string, string> = {
+  'Conectividad': 'Conectividad',
+  'Electrodomesticos': 'Electrodomésticos',
+  'Fuentes De Alimentacion Gabinetes Y Fuentes': 'Fuentes de Alimentación',
+  'Multifuncion Impresoras': 'Impresoras Multifunción',
+  'Ink Jet Impresoras': 'Impresoras Ink Jet',
+  'Memorias Ram': 'Memorias RAM',
+  'Amd Microprocesadores': 'AMD',
+  'Intel Microprocesadores': 'Intel',
+  'Monitor Consumo Monitores': 'Monitores de Consumo',
+  'Monitor Corporativo Monitores': 'Monitores Corporativos',
+  'Monitor Gamer Monitores': 'Monitores Gamer',
+  'Plataforma Amd Mothers': 'Plataforma AMD',
+  'Plataforma Intel Mothers': 'Plataforma Intel',
+  'Linea Nvidia Geforce Placas De Video': 'NVIDIA GeForce',
+  'Linea Quadro Radeon Pro Placas De Video': 'NVIDIA Quadro / AMD Radeon Pro',
+  'Linea Amd Radeon Placas De Video': 'AMD Radeon',
+  'Papel Resma Varios': 'Papel y Resmas',
+  'Streaming Gamers': 'Streaming',
+  'Energia': 'Energía',
+  'Gabinetes': 'Gabinetes',
+  'Disco Rigido Externo Discos Rigidos Ssd': 'Discos Externos',
+  'Consumibles': 'Consumibles',
+  'Router Conectividad': 'Routers',
+  'All In One Computadoras': 'All In One',
+  'Media Conv Modulos Conectividad': 'Media Converter',
+  'Impresoras': 'Impresoras',
+  'Switches Administrables Conectividad': 'Switches Administrables',
+  'Super Ofertas': 'Super Ofertas',
+  'Notebooks': 'Notebooks',
+  'Switches No Administrables Conectividad': 'Switches No Administrables',
+  'Computadoras': 'Computadoras',
+  'Gabinetes Con Fuente Gabinetes Y Fuentes': 'Gabinetes con Fuente',
+  'Destacados': 'Destacados',
+  'Coolers': 'Coolers',
+  'Tintas Consumibles': 'Tintas',
+  'Cartuchos Consumibles': 'Cartuchos',
+  'Almacenamiento': 'Almacenamiento',
+  'Accesorios Gamer Gamers': 'Accesorios Gamer',
+  'Mousepads Perifericos': 'Mousepads',
+  'Sillas Y Escritorios Gamers': 'Sillas y Escritorios',
+  'Placas De Red Wifi Pci Conectividad': 'Placas WiFi PCI',
+  'Smart Home Conectividad': 'Smart Home',
+  'Consumibles Hp Consumibles': 'HP Consumibles',
+  'Perifericos': 'Periféricos',
+  'Carry Disk Discos Rigidos Ssd': 'Carry Disk',
+  'De Red Cables Conectividad': 'Cables de Red',
+  'Camaras Ip Conectividad': 'Cámaras IP',
+  'Watercoolers Coolers': 'Watercoolers',
+  'Proyectores': 'Proyectores',
+  'Tablets': 'Tablets',
+  'Mouse Perifericos': 'Mouse',
+  'Teclados Perifericos': 'Teclados',
+  'Parlantes Perifericos': 'Parlantes',
+  'Gamers': 'Gamers',
+  'Web Cam Perifericos': 'Webcams',
+  'Microfonos Perifericos': 'Micrófonos',
+  'Teclado Mouse Perifericos': 'Teclado + Mouse',
+  'Teclados Gamers': 'Teclados Gamer',
+  'Pc Computadoras': 'PC',
+  'Accesorios Bluetooth Conectividad': 'Accesorios Bluetooth',
+  'Access Point Y Extensores De Rango Conectividad': 'Access Points',
+  'Modem Adsl Y Gpon Conectividad': 'Módems ADSL / GPON',
+  'Placas De Red Ethernet Y Adaptadores Usb Conectividad': 'Placas Ethernet / USB',
+  'Placas De Red Wifi Usb Conectividad': 'Placas WiFi USB',
+  'Poe Power Over Ethernet Conectividad': 'PoE / Power over Ethernet',
+  'Router Wireless Conectividad': 'Routers Wireless',
+  'Disco Ssd Discos Rigidos Ssd': 'Discos SSD',
+  'Disco Ssd M2 Discos Rigidos Ssd': 'Discos SSD M.2',
+  'Gabinetes Sin Fuente Gabinetes Y Fuentes': 'Gabinetes sin Fuente',
+}
+
+function nombreLimpio(original: string): string {
+  return CLEAN_NAMES[original] ?? original
+}
+
 export function ProductosPage() {
   const [searchParams, setSearchParams] = useSearchParams()
   const { data: productos = [], isLoading } = useProductosActivos()
@@ -296,7 +372,7 @@ export function ProductosPage() {
                                 onChange={() => toggleCategoria(cat.slug)}
                                 className="w-3.5 h-3.5 rounded border-cyan-500/30 bg-gray-800 text-cyan-500 focus:ring-cyan-500/50 focus:ring-2"
                               />
-                              <span className="text-xs group-hover:text-cyan-400 transition-colors">{cat.nombre}</span>
+                              <span className="text-xs group-hover:text-cyan-400 transition-colors">{nombreLimpio(cat.nombre)}</span>
                               <span className="text-xs text-gray-500 ml-auto">
                                 ({productos.filter((p) => p.categoria?.slug === cat.slug).length})
                               </span>
