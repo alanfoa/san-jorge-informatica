@@ -132,18 +132,6 @@ export function ProductoPage() {
               </p>
             )}
 
-            {p.descripcion && (
-              <div className="border-t border-cyan-500/20 pt-6">
-                <h3 className="text-white font-bold text-lg mb-4 flex items-center gap-2">
-                  <Info className="w-5 h-5 text-cyan-400" /> Descripción
-                </h3>
-                <div
-                  className="text-gray-300 text-sm leading-relaxed prose prose-invert max-w-none [&_table]:w-full [&_table]:border-collapse [&_td]:border [&_td]:border-cyan-500/20 [&_td]:px-3 [&_td]:py-2 [&_th]:border [&_th]:border-cyan-500/20 [&_th]:px-3 [&_th]:py-2 [&_th]:bg-cyan-500/10 [&_th]:text-cyan-400 [&_td]:text-gray-300"
-                  dangerouslySetInnerHTML={{ __html: p.descripcion }}
-                />
-              </div>
-            )}
-
             {p.caracteristicas && p.caracteristicas.filter(c => c.nombre !== 'SKU' && c.nombre !== 'URL Origen').length > 0 && (
               <div className="border-t border-cyan-500/20 pt-6">
                 <h3 className="text-white font-bold text-lg mb-4 flex items-center gap-2">
@@ -201,6 +189,18 @@ export function ProductoPage() {
             </div>
           </div>
         </div>
+
+        {p.descripcion && (
+          <div className="mb-16">
+            <h3 className="text-white font-bold text-2xl mb-6 flex items-center gap-2">
+              <Info className="w-6 h-6 text-cyan-400" /> Descripción
+            </h3>
+            <div
+              className="text-gray-300 text-sm leading-relaxed prose prose-invert max-w-none [&_table]:w-full [&_table]:border-collapse [&_td]:border [&_td]:border-cyan-500/20 [&_td]:px-3 [&_td]:py-2 [&_th]:border [&_th]:border-cyan-500/20 [&_th]:px-3 [&_th]:py-2 [&_th]:bg-cyan-500/10 [&_th]:text-cyan-400 [&_td]:text-gray-300"
+              dangerouslySetInnerHTML={{ __html: p.descripcion }}
+            />
+          </div>
+        )}
 
         {relacionados.length > 0 && (
           <section>
