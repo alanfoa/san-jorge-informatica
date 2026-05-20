@@ -41,7 +41,7 @@ export function ProductCard({ producto }: ProductCardProps) {
         </div>
 
         <Link to={`/productos/${producto.id}`}>
-          <h3 className="text-white font-semibold leading-tight hover:text-cyan-400 transition-colors break-words">
+          <h3 className="text-white font-semibold leading-tight hover:text-cyan-400 transition-colors break-words mb-3">
             {producto.nombre}
           </h3>
         </Link>
@@ -50,7 +50,7 @@ export function ProductCard({ producto }: ProductCardProps) {
           <p className="text-white font-bold text-lg">${producto.precio.toLocaleString('es-AR')}</p>
         )}
 
-        <div className="flex gap-2">
+        <div className="flex gap-2 pt-1">
           <a
             href={`https://wa.me/${WHATSAPP}?text=${text}`}
             target="_blank"
