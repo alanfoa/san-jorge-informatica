@@ -1,11 +1,13 @@
 import { Link, useLocation } from 'react-router-dom'
-import { Menu, X } from 'lucide-react'
+import { Menu, X, ShoppingCart } from 'lucide-react'
 import { useState } from 'react'
 import { WHATSAPP } from '@/lib/constants'
+import { useCart } from '@/hooks/useCart'
 
 export function Navbar() {
   const [isOpen, setIsOpen] = useState(false)
   const location = useLocation()
+  const { totalItems } = useCart()
 
   const navLinks = [
     { to: '/', label: 'Inicio' },
@@ -62,7 +64,18 @@ export function Navbar() {
             })}
           </div>
 
-          <div className="hidden md:block">
+          <div className="hidden md:flex items-center gap-4">
+            <Link
+              to="/carrito"
+              className="relative p-2 text-gray-300 hover:text-cyan-400 transition-colors"
+            >
+              <ShoppingCart className="w-6 h-6" />
+              {totalItems > 0 && (
+                <span className="absolute -top-1 -right-1 w-5 h-5 bg-cyan-500 text-white text-xs font-bold rounded-full flex items-center justify-center">
+                  {totalItems > 9 ? '9+' : totalItems}
+                </span>
+              )}
+            </Link>
             <a
               href={`https://wa.me/${WHATSAPP}?text=Hola%2C%20quiero%20m%C3%A1s%20informaci%C3%B3n`}
               target="_blank"
@@ -73,12 +86,25 @@ export function Navbar() {
             </a>
           </div>
 
-          <button
-            onClick={() => setIsOpen(!isOpen)}
-            className="md:hidden text-gray-300 hover:text-cyan-400 transition-colors"
-          >
-            {isOpen ? <X size={24} /> : <Menu size={24} />}
-          </button>
+          <div className="md:hidden flex items-center gap-2">
+            <Link
+              to="/carrito"
+              className="relative p-2 text-gray-300 hover:text-cyan-400 transition-colors"
+            >
+              <ShoppingCart className="w-6 h-6" />
+              {totalItems > 0 && (
+                <span className="absolute -top-1 -right-1 w-5 h-5 bg-cyan-500 text-white text-xs font-bold rounded-full flex items-center justify-center">
+                  {totalItems > 9 ? '9+' : totalItems}
+                </span>
+              )}
+            </Link>
+            <button
+              onClick={() => setIsOpen(!isOpen)}
+              className="text-gray-300 hover:text-cyan-400 transition-colors"
+            >
+              {isOpen ? <X size={24} /> : <Menu size={24} />}
+            </button>
+          </div>
         </div>
       </div>
 

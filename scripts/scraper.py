@@ -5,6 +5,7 @@ Extrae productos de las páginas de categoría del sitemap
 y genera backend/seeds/seed-invid.json para importar en la BD del proyecto.
 """
 
+import html as _html
 import json
 import logging
 import os
@@ -26,6 +27,7 @@ BASE_URL = "https://www.invidcomputers.com"
 SITEMAP_URL = f"{BASE_URL}/sitemap.xml"
 USER_AGENT = "Mozilla/5.0 (Windows NT 10.0; Win64; x64) AppleWebKit/537.36"
 REQUEST_DELAY = 1.0  # segundos entre requests (respetar servidor)
+DETAIL_DELAY = 0.3  # delay entre páginas de detalle
 OUTPUT_PATH = os.path.join(
     os.path.dirname(os.path.dirname(os.path.abspath(__file__))),
     "backend",
@@ -175,6 +177,23 @@ def scrape_category(cat_url: str, cat_slug: str) -> list[dict]:
     return products
 
 
+def scrape_description(url: str) -> str:
+    """Fetches a product detail page and extracts description from <meta name='Description' content='...'>."""
+    try:
+        html = fetch(url)
+        match = re.search(
+            r'<meta[^>]*name="Description"[^>]*content="([^"]*)"',
+            html,
+            re.IGNORECASE,
+        )
+        if match:
+            desc = _html.unescape(match.group(1).strip())
+            return desc
+    except Exception as e:
+        logger.warning(f"  Error obteniendo descripción de {url}: {e}")
+    return ""
+
+
 def normalize_slug(slug: str) -> str:
     """Normaliza slug para que coincida con las categorías existentes en la BD."""
     # Mapeo de slugs del sitio a los slugs de nuestra BD
@@ -241,7 +260,22 @@ def main():
         if i < len(categories):
             time.sleep(REQUEST_DELAY)
 
-    # 3. Guardar resultado
+    # 3. Obtener descripciones de las páginas de detalle
+    logger.info("Obteniendo descripciones de productos...")
+    desc_count = 0
+    for i, p in enumerate(all_products, 1):
+        desc = scrape_description(p["url_origen"])
+        if desc:
+            p["descripcion"] = desc
+            desc_count += 1
+        if i % 50 == 0 or i == len(all_products):
+            logger.info(f"  Descripciones: {i}/{len(all_products)} ({desc_count} obtenidas)")
+        if i < len(all_products):
+            time.sleep(DETAIL_DELAY)
+
+    logger.info(f"Descripciones obtenidas: {desc_count}/{len(all_products)}")
+
+    # 4. Guardar resultado
     os.makedirs(os.path.dirname(OUTPUT_PATH), exist_ok=True)
 
     output = {

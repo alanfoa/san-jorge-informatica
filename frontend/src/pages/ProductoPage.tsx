@@ -3,7 +3,9 @@ import { useParams, Link } from 'react-router-dom'
 import { ProductCard } from '@/components/ProductCard'
 import { DetailSkeleton } from '@/components/DetailSkeleton'
 import { useProducto, useProductosActivos } from '@/hooks/queries'
-import { MessageCircle, ArrowLeft, Check, Info, ChevronLeft, ChevronRight } from 'lucide-react'
+import { useCart } from '@/hooks/useCart'
+import { useToast } from '@/hooks/useToast'
+import { MessageCircle, ShoppingCart, ArrowLeft, Check, Info, ChevronLeft, ChevronRight } from 'lucide-react'
 import { WHATSAPP } from '@/lib/constants'
 
 export function ProductoPage() {
@@ -11,6 +13,8 @@ export function ProductoPage() {
   const productoId = id ? Number(id) : undefined
   const { data: p, isLoading, isError } = useProducto(productoId)
   const { data: todos = [] } = useProductosActivos()
+  const { addItem } = useCart()
+  const { toast } = useToast()
   const [imgIdx, setImgIdx] = useState(0)
 
   const relacionados = todos.filter(
@@ -150,7 +154,17 @@ export function ProductoPage() {
               </div>
             )}
 
-            <div className="space-y-4 pt-6">
+            <div className="space-y-3 pt-6">
+              <button
+                onClick={() => {
+                  addItem(p)
+                  toast('success', `${p.nombre.slice(0, 50)}… agregado al carrito`)
+                }}
+                className="w-full px-8 py-4 bg-gradient-to-r from-cyan-600 to-blue-700 hover:from-cyan-500 hover:to-blue-600 text-white rounded-xl font-bold text-lg flex items-center justify-center gap-3 shadow-xl shadow-cyan-600/50 hover:shadow-cyan-600/70 hover:scale-105 transition-all group"
+              >
+                <ShoppingCart className="w-6 h-6 group-hover:scale-110 transition-transform" />
+                Agregar al Carrito
+              </button>
               <a
                 href={`https://wa.me/${WHATSAPP}?text=${text}`}
                 target="_blank"

@@ -154,6 +154,10 @@ async function main() {
         existing.precio = p.precio;
         changed = true;
       }
+      if (p.descripcion && existing.descripcion !== p.descripcion) {
+        existing.descripcion = p.descripcion;
+        changed = true;
+      }
       if (changed) {
         await prodRepo.save(existing);
         updated++;
@@ -166,7 +170,7 @@ async function main() {
     // Crear nuevo producto
     const prod = prodRepo.create({
       nombre: p.nombre,
-      descripcion: "",
+      descripcion: p.descripcion || "",
       precio: p.precio || 0,
       imagen: p.imagen || "",
       activo: true,

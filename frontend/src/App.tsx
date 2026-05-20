@@ -3,6 +3,7 @@ import { ScrollToTop } from '@/components/ScrollToTop'
 import { Navbar } from '@/components/Navbar'
 import { Footer } from '@/components/Footer'
 import { HomePage } from '@/pages/HomePage'
+import { CartPage } from '@/pages/CartPage'
 import { ProductosPage } from '@/pages/ProductosPage'
 import { ProductoPage } from '@/pages/ProductoPage'
 import { LoginPage } from '@/pages/LoginPage'
@@ -22,6 +23,7 @@ export default function App() {
         <Route path="/" element={<HomePage />} />
         <Route path="/productos" element={<ProductosPage />} />
         <Route path="/productos/:id" element={<ProductoPage />} />
+        <Route path="/carrito" element={<CartPage />} />
         <Route path="/admin/login" element={<LoginPage />} />
         <Route element={<AdminRoute />}>
           <Route path="/admin" element={<AdminPage />} />
