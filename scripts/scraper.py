@@ -196,7 +196,6 @@ def scrape_description(url: str) -> str:
 
 def normalize_slug(slug: str) -> str:
     """Normaliza slug para que coincida con las categorías existentes en la BD."""
-    # Mapeo de slugs del sitio a los slugs de nuestra BD
     slug_map = {
         "microprocesadores": "procesadores",
         "placas-de-video": "placas-de-video",

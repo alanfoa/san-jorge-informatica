@@ -133,17 +133,25 @@ export function ProductoPage() {
             )}
 
             {p.descripcion && (
-              <p className="text-gray-400 text-lg leading-relaxed">{p.descripcion}</p>
+              <div className="border-t border-cyan-500/20 pt-6">
+                <h3 className="text-white font-bold text-lg mb-4 flex items-center gap-2">
+                  <Info className="w-5 h-5 text-cyan-400" /> Descripción
+                </h3>
+                <div
+                  className="text-gray-300 text-sm leading-relaxed prose prose-invert max-w-none [&_table]:w-full [&_table]:border-collapse [&_td]:border [&_td]:border-cyan-500/20 [&_td]:px-3 [&_td]:py-2 [&_th]:border [&_th]:border-cyan-500/20 [&_th]:px-3 [&_th]:py-2 [&_th]:bg-cyan-500/10 [&_th]:text-cyan-400 [&_td]:text-gray-300"
+                  dangerouslySetInnerHTML={{ __html: p.descripcion }}
+                />
+              </div>
             )}
 
-            {p.caracteristicas && p.caracteristicas.filter(c => c.nombre !== 'SKU' && c.nombre !== 'URL Invid').length > 0 && (
+            {p.caracteristicas && p.caracteristicas.filter(c => c.nombre !== 'SKU' && c.nombre !== 'URL Origen').length > 0 && (
               <div className="border-t border-cyan-500/20 pt-6">
                 <h3 className="text-white font-bold text-lg mb-4 flex items-center gap-2">
                   <Info className="w-5 h-5 text-cyan-400" /> Especificaciones
                 </h3>
                 <div className="grid grid-cols-1 sm:grid-cols-2 gap-3">
                   {p.caracteristicas
-                    .filter(c => c.nombre !== 'SKU' && c.nombre !== 'URL Invid')
+                    .filter(c => c.nombre !== 'SKU' && c.nombre !== 'URL Origen')
                     .map((c, i) => (
                     <div key={i} className="bg-gray-900/80 rounded-lg px-4 py-3 border border-cyan-500/10">
                       <span className="text-gray-500 text-xs uppercase tracking-wider">{c.nombre}</span>

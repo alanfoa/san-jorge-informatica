@@ -69,15 +69,15 @@ async function main() {
   await ds.initialize();
   console.log("✓ Conectado a la base de datos");
 
-  // ── 0. Limpiar Caracteristicas internas viejas (SKU y URL Invid) ──
+  // ── 0. Limpiar Caracteristicas internas viejas (SKU y URL Origen) ──
   const deleteResult = await ds
     .createQueryBuilder()
     .delete()
     .from("caracteristicas")
-    .where("nombre IN ('SKU', 'URL Invid')")
+    .where("nombre IN ('SKU', 'URL Origen', 'URL Invid')")
     .execute();
   if (deleteResult.affected && deleteResult.affected > 0) {
-    console.log(`  Limpiadas ${deleteResult.affected} Caracteristicas internas (SKU / URL Invid)`);
+    console.log(`  Limpiadas ${deleteResult.affected} Caracteristicas internas (SKU / URL Origen)`);
   }
 
   // ── 1. Crear categorías que no existan ──

@@ -14,9 +14,33 @@ async function get(url) {
 }
 
 function extractDescription(html) {
-  const match = html.match(/<meta[^>]*name="Description"[^>]*content="([^"]*)"/i)
-  if (!match) return ''
-  return match[1]
+  const tabStart = html.match(/<div[^>]*class="tab-pane[^"]*active[^"]*"[^>]*>/i)
+  if (!tabStart) return ''
+
+  let depth = 1
+  let i = tabStart.index + tabStart[0].length
+
+  while (i < html.length && depth > 0) {
+    if (html[i] === '<') {
+      const next5 = html.slice(i, i + 6)
+      if (next5 === '</div>') {
+        depth--
+        i += 6
+      } else if (/^<div(?:[\s>])/.test(html.slice(i, i + 5))) {
+        depth++
+        i++
+      } else {
+        i++
+      }
+    } else {
+      i++
+    }
+  }
+
+  const content = html.slice(tabStart.index + tabStart[0].length, i - 6).trim()
+  if (!content) return ''
+
+  return content
     .replace(/&nbsp;/g, ' ')
     .replace(/&amp;/g, '&')
     .replace(/&lt;/g, '<')
@@ -59,7 +83,6 @@ async function main() {
 
   for (let i = 0; i < productos.length; i++) {
     const p = productos[i]
-    if (p.descripcion) continue
     const url = p.url_origen
     if (!url) continue
 
