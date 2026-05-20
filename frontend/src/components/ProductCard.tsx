@@ -46,10 +46,6 @@ export function ProductCard({ producto }: ProductCardProps) {
           </h3>
         </Link>
 
-        <p className="text-gray-400 text-sm line-clamp-2">
-          {producto.descripcion}
-        </p>
-
         {producto.precio > 0 && (
           <p className="text-white font-bold text-lg">${producto.precio.toLocaleString('es-AR')}</p>
         )}
