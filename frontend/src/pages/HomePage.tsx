@@ -121,31 +121,28 @@ export function HomePage() {
     }
   }
 
-  interface CatDeseada { nombre: string; keywords: string[]; soloSlugs?: string[] }
+  interface CatDeseada { nombre: string; keywords: string[]; slugsParaUrl?: string[] }
   const DESEADAS: CatDeseada[] = [
     { nombre: 'Procesadores', keywords: ['procesador', 'microprocesador'] },
     { nombre: 'Tarjetas Gráficas', keywords: ['grafica', 'video', 'vga'] },
     { nombre: 'Memoria Ram', keywords: ['memoria', 'ram'] },
     { nombre: 'Almacenamiento', keywords: ['almacenamiento', 'disco', 'ssd', 'hdd'] },
-    { nombre: 'Fuentes', keywords: ['fuente', 'fuente de alimentacion'], soloSlugs: ['fuentes'] },
-    { nombre: 'Gabinetes', keywords: ['gabinete'], soloSlugs: ['gabinetes'] },
+    { nombre: 'Fuentes', keywords: ['fuente', 'fuente de alimentacion'], slugsParaUrl: ['fuentes-de-alimentacion-gabinetes-y-fuentes'] },
+    { nombre: 'Gabinetes', keywords: ['gabinete'] },
     { nombre: 'Mothers', keywords: ['mother', 'motherboard', 'placa madre'] },
     { nombre: 'Periféricos', keywords: ['periferico', 'teclado', 'mouse'] },
   ]
   const catList = [...catMap.values()]
   const slugsUsados = new Set<string>()
-  const topCats = DESEADAS.map(({ nombre, keywords, soloSlugs }) => {
-    let matches = catList.filter(c =>
+  const topCats = DESEADAS.map(({ nombre, keywords, slugsParaUrl }) => {
+    const matches = catList.filter(c =>
       keywords.some(k => c.nombre.toLowerCase().includes(k))
     )
-    if (soloSlugs) {
-      matches = matches.filter(m => soloSlugs.includes(m.slug))
-    }
     if (matches.length === 0) return null
     for (const m of matches) slugsUsados.add(m.slug)
     return {
       nombre,
-      slugs: matches.map(m => m.slug),
+      slugs: slugsParaUrl ?? matches.map(m => m.slug),
       count: matches.reduce((s, c) => s + c.count, 0)
     }
   }).filter((c): c is NonNullable<typeof c> => c !== null)
