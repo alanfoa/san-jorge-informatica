@@ -190,12 +190,9 @@ export function ProductosPage() {
   const productosFiltrados = useMemo(() => {
     return productos.filter((producto) => {
       const catSlug = producto.categoria?.slug ?? ''
-      const catNombre = producto.categoria?.nombre ?? ''
       const matchBusqueda =
         busqueda === '' ||
-        producto.nombre.toLowerCase().includes(busqueda.toLowerCase()) ||
-        (producto.descripcion ?? '').toLowerCase().includes(busqueda.toLowerCase()) ||
-        catNombre.toLowerCase().includes(busqueda.toLowerCase())
+        producto.nombre.toLowerCase().includes(busqueda.toLowerCase())
 
       const matchCategoria =
         categoriasSeleccionadas.length === 0 ||
