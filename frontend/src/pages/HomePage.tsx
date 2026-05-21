@@ -5,7 +5,7 @@ import { useProductosActivos } from '@/hooks/queries'
 import {
   Cpu, HardDrive, MonitorPlay, Gamepad2, Monitor,
   Printer, Tablet, Package, Headphones, Camera, Wifi,
-  Search, MessageCircle, Truck, Zap,
+  Search, MessageCircle, Truck, Zap, CircuitBoard,
 } from 'lucide-react'
 import { WHATSAPP } from '@/lib/constants'
 
@@ -13,6 +13,7 @@ function iconoParaCategoria(nombre: string): React.ReactNode {
   const n = nombre.toLowerCase()
   if (/video|vga|grafica|monitor/i.test(n)) return <MonitorPlay className="w-8 h-8" />
   if (/micro|procesador|cpu/i.test(n)) return <Cpu className="w-8 h-8" />
+  if (/mother|placa.madre|motherboard/i.test(n)) return <CircuitBoard className="w-8 h-8" />
   if (/disco|ssd|almacenamiento|hd[ds]/i.test(n)) return <HardDrive className="w-8 h-8" />
   if (/mouse|teclado|periferico|parlante|audifono/i.test(n)) return <Gamepad2 className="w-8 h-8" />
   if (/router|wifi|red|conectividad|switch|modem|access.point/i.test(n)) return <Wifi className="w-8 h-8" />
@@ -126,6 +127,9 @@ export function HomePage() {
     { nombre: 'Tarjetas Gráficas', keywords: ['grafica', 'video', 'vga'] },
     { nombre: 'Memoria Ram', keywords: ['memoria', 'ram'] },
     { nombre: 'Almacenamiento', keywords: ['almacenamiento', 'disco', 'ssd', 'hdd'] },
+    { nombre: 'Fuentes', keywords: ['fuente', 'fuente de alimentacion'] },
+    { nombre: 'Gabinetes', keywords: ['gabinete'] },
+    { nombre: 'Mothers', keywords: ['mother', 'motherboard', 'placa madre'] },
   ]
   const catList = [...catMap.values()]
   const slugsUsados = new Set<string>()
@@ -142,11 +146,12 @@ export function HomePage() {
     }
   }).filter((c): c is NonNullable<typeof c> => c !== null)
 
-  if (topCats.length < 4) {
+  const MAX_DESEADAS = DESEADAS.length
+  if (topCats.length < MAX_DESEADAS) {
     const restantes = catList
       .filter(c => !slugsUsados.has(c.slug))
       .sort((a, b) => b.count - a.count)
-    for (const r of restantes.slice(0, 4 - topCats.length)) {
+    for (const r of restantes.slice(0, MAX_DESEADAS - topCats.length)) {
       topCats.push({ nombre: r.nombre, slugs: [r.slug], count: r.count })
     }
   }
@@ -230,7 +235,7 @@ export function HomePage() {
             </p>
           </div>
 
-          <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-4 gap-6">
+          <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-4 xl:grid-cols-7 gap-6">
             {topCats.map((cat) => { return (
                 <Link
                   key={cat.slugs[0]}
