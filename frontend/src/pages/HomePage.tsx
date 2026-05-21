@@ -105,9 +105,19 @@ function nombreLimpio(original: string): string {
 export function HomePage() {
   const { data: productos = [], isLoading } = useProductosActivos()
 
-  const productosMostrados = productos.filter(p => p.destacado).slice(0, 4)
+  const CATS_PREMIUM = [
+    'linea-nvidia-geforce-placas-de-video',
+    'linea-amd-radeon-placas-de-video',
+    'linea-quadro-radeon-pro-placas-de-video',
+    'procesadores',
+    'memorias-ram',
+    'disco-ssd-m2-discos-rigidos-ssd',
+  ]
+  const premium = productos.filter(p => p.categoria?.slug && CATS_PREMIUM.includes(p.categoria.slug))
+  const shuffled = [...premium].sort(() => Math.random() - 0.5)
+  const productosMostrados = shuffled.slice(0, 4)
   if (productosMostrados.length < 4) {
-    const rest = productos.filter(p => !p.destacado).slice(0, 4 - productosMostrados.length)
+    const rest = productos.filter(p => !productosMostrados.find(m => m.id === p.id)).slice(0, 4 - productosMostrados.length)
     productosMostrados.push(...rest)
   }
 
