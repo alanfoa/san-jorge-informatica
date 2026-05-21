@@ -1,11 +1,34 @@
+import { useState } from 'react'
 import { Link } from 'react-router-dom'
 import { useCart } from '@/hooks/useCart'
 import { WHATSAPP } from '@/lib/constants'
 import { sanitizarNombre } from '@/lib/sanitize'
-import { ShoppingCart, Trash2, Plus, Minus, ArrowLeft, MessageCircle } from 'lucide-react'
+import { api } from '@/api/client'
+import { ShoppingCart, Trash2, Plus, Minus, ArrowLeft, MessageCircle, CreditCard, Loader2 } from 'lucide-react'
 
 export function CartPage() {
   const { items, removeItem, updateQuantity, clearCart, totalItems } = useCart()
+  const [pagando, setPagando] = useState(false)
+
+  const itemsConPrecio = items.filter(i => i.producto.precio > 0)
+
+  async function pagarMercadoPago() {
+    setPagando(true)
+    try {
+      const res = await api.createMercadoPagoPreference(
+        itemsConPrecio.map(i => ({
+          title: sanitizarNombre(i.producto.nombre),
+          quantity: i.cantidad,
+          unit_price: i.producto.precio,
+        }))
+      )
+      window.open(res.init_point, '_blank')
+    } catch (e: any) {
+      alert(e.message)
+    } finally {
+      setPagando(false)
+    }
+  }
 
   function whatsappText() {
     const lines = items.map(
@@ -120,15 +143,31 @@ export function CartPage() {
 
         <div className="bg-gradient-to-r from-cyan-500/10 to-purple-500/10 border border-cyan-500/20 rounded-2xl p-6 text-center">
           <p className="text-gray-400 mb-4">Los precios y disponibilidad se confirmarán al enviar la consulta</p>
-          <a
-            href={`https://wa.me/${WHATSAPP}?text=${whatsappText()}`}
-            target="_blank"
-            rel="noopener noreferrer"
-            className="inline-flex items-center gap-3 px-8 py-4 bg-gradient-to-r from-green-600 to-green-700 hover:from-green-500 hover:to-green-600 text-white rounded-xl font-bold text-lg shadow-xl shadow-green-600/50 hover:shadow-green-600/70 hover:scale-105 transition-all"
-          >
-            <MessageCircle className="w-6 h-6" />
-            Enviar pedido por WhatsApp
-          </a>
+          <div className="flex flex-col sm:flex-row gap-4 justify-center">
+            <a
+              href={`https://wa.me/${WHATSAPP}?text=${whatsappText()}`}
+              target="_blank"
+              rel="noopener noreferrer"
+              className="inline-flex items-center gap-3 px-8 py-4 bg-gradient-to-r from-green-600 to-green-700 hover:from-green-500 hover:to-green-600 text-white rounded-xl font-bold text-lg shadow-xl shadow-green-600/50 hover:shadow-green-600/70 hover:scale-105 transition-all"
+            >
+              <MessageCircle className="w-6 h-6" />
+              Consultar por WhatsApp
+            </a>
+            {itemsConPrecio.length > 0 && (
+              <button
+                onClick={pagarMercadoPago}
+                disabled={pagando}
+                className="inline-flex items-center gap-3 px-8 py-4 bg-gradient-to-r from-blue-600 to-cyan-600 hover:from-blue-500 hover:to-cyan-500 text-white rounded-xl font-bold text-lg shadow-xl shadow-blue-600/50 hover:shadow-blue-600/70 hover:scale-105 transition-all disabled:opacity-50 disabled:cursor-not-allowed"
+              >
+                {pagando ? (
+                  <Loader2 className="w-6 h-6 animate-spin" />
+                ) : (
+                  <CreditCard className="w-6 h-6" />
+                )}
+                Pagar con Mercado Pago
+              </button>
+            )}
+          </div>
         </div>
       </div>
     </div>

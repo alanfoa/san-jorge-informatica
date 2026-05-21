@@ -120,6 +120,13 @@ Producto 1 ──── N Caracteristica
 | PATCH | /users/:id | admin | Editar |
 | DELETE | /users/:id | admin | Eliminar |
 
+### Mercado Pago
+| Método | Ruta | Auth | Descripción |
+|--------|------|------|-------------|
+| POST | /mercadopago/create-preference | — | Crea preferencia de pago (carrito) y devuelve link de Checkout Pro |
+
+Requiere `MERCADOPAGO_ACCESS_TOKEN` en `.env`.
+
 ### Upload
 | Método | Ruta | Auth | Descripción |
 |--------|------|------|-------------|
@@ -171,6 +178,33 @@ Requisitos UX:
 - Mobile-friendly (que funcione bien desde el celular)
 - Toast notifications para feedback claro (no `alert()`)
 
+## HomePage — Categorías Destacadas (Componentes por Categoría)
+
+El home renderiza un grid de 8 categorías en `HomePage.tsx:124-158` usando el array `DESEADAS`.
+
+### Mecanismo
+
+1. **`catMap`** (línea 114): se construye a partir de todos los productos activos. Agrupa por `categoria.slug` y cuenta productos por categoría.
+2. **`DESEADAS`** (líneas 125-134): define las 8 categorías que queremos mostrar en el home. Cada entrada tiene:
+   - `nombre`: texto visible en la card
+   - `keywords`: palabras clave para matchear contra `categoria.nombre` (case-insensitive, `.includes()`)
+   - `slugsParaUrl?`: **opcional**. Si está presente, SOBREESCRIBE los slugs usados en el link de la card. Sino, usa todos los slugs de las categorías matcheadas.
+3. **`slugsUsados`** (línea 136): set que acumula slugs de categorías matcheadas por cada DESEADAS. Previene que aparezcan duplicados en `restantes`.
+4. **`restantes`** (líneas 150-158): si alguna DESEADAS no matchea ninguna categoría (retorna `null`), se rellena con las categorías más populares no usadas aún, hasta llegar a 8 cards.
+
+### slugsParaUrl
+
+Se usa cuando los keywords matchean categorías cuyo nombre contiene substrings de otras categorías. Por ejemplo:
+
+- **`Fuentes`**: keywords `['fuente', 'fuente de alimentacion']` matchean `"Fuentes De Alimentacion Gabinetes Y Fuentes"`, `"Gabinetes Y Fuentes"`, etc. Sin `slugsParaUrl`, la URL incluiría categorías de gabinetes. Con `slugsParaUrl: ['fuentes-de-alimentacion-gabinetes-y-fuentes']` solo filtra por Fuentes de Alimentación.
+- **`Gabinetes`**: keywords `['gabinete']` también matchean `"Fuentes De Alimentacion Gabinetes Y Fuentes"` porque contiene "gabinetes". Sin `slugsParaUrl`, la URL incluiría Fuentes de Alimentación. Con `slugsParaUrl: ['gabinetes-y-fuentes', 'gabinetes-con-fuente-gabinetes-y-fuentes', 'gabinetes-sin-fuente-gabinetes-y-fuentes']` solo filtra gabinetes.
+
+**Regla**: si una DESEADAS usa keywords que pueden solaparse con otras categorías, agregar `slugsParaUrl` con los slugs exactos que debe filtrar.
+
+### Clean Names
+
+`CLEAN_NAMES` (líneas 29-99) mapea nombres originales de categorías (ej: `"Fuentes De Alimentacion Gabinetes Y Fuentes"`) a nombres limpios de display (ej: `"Fuentes de Alimentación"`). Se usa tanto en HomePage como en ProductosPage.
+
 ## Convenciones de código
 
 - No agregar comentarios a menos que se solicite explícitamente
@@ -209,10 +243,11 @@ Si se necesita un favicon legacy (.ico), se debe generar aparte.
    - **Root Directory**: `backend`
    - **Build Command**: `npm install && npm run build`
    - **Start Command**: `npm run seed:prod && npm run start:prod`
-   - **Environment Variables**:
-     - `NODE_ENV` = `production`
-     - `JWT_SECRET` = generar uno aleatorio (ej: `openssl rand -hex 32`)
-     - `CORS_ORIGIN` = URL de Netlify (se configura después)
+    - **Environment Variables**:
+      - `NODE_ENV` = `production`
+      - `JWT_SECRET` = generar uno aleatorio (ej: `openssl rand -hex 32`)
+      - `CORS_ORIGIN` = URL de Netlify (se configura después)
+      - `MERCADOPAGO_ACCESS_TOKEN` = token de producción de Mercado Pago (ver sección Mercado Pago)
 
 ### Notas importantes sobre Render (Free Tier)
 

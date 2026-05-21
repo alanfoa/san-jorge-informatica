@@ -128,7 +128,7 @@ export function HomePage() {
     { nombre: 'Memoria Ram', keywords: ['memoria', 'ram'] },
     { nombre: 'Almacenamiento', keywords: ['almacenamiento', 'disco', 'ssd', 'hdd'] },
     { nombre: 'Fuentes', keywords: ['fuente', 'fuente de alimentacion'], slugsParaUrl: ['fuentes-de-alimentacion-gabinetes-y-fuentes'] },
-    { nombre: 'Gabinetes', keywords: ['gabinete'] },
+    { nombre: 'Gabinetes', keywords: ['gabinete'], slugsParaUrl: ['gabinetes-y-fuentes', 'gabinetes-con-fuente-gabinetes-y-fuentes', 'gabinetes-sin-fuente-gabinetes-y-fuentes'] },
     { nombre: 'Mothers', keywords: ['mother', 'motherboard', 'placa madre'] },
     { nombre: 'Periféricos', keywords: ['periferico', 'teclado', 'mouse'] },
   ]

@@ -88,7 +88,19 @@
 - [ ] Probar ejecución manual (`workflow_dispatch`)
 - [ ] Verificar que Render redeploya tras push del scraper
 
-### C) Migrar upload a Cloudinary 👤
+### C) Mercado Pago — Pendiente 👤
+
+La lógica ya está implementada:
+- **Backend**: `POST /mercadopago/create-preference` en `backend/src/modules/mercadopago/`
+- **Frontend**: Botón "Pagar con Mercado Pago" en CartPage (visible solo si hay items con precio)
+
+**Lo que falta:**
+1. 👤 Obtener `MERCADOPAGO_ACCESS_TOKEN` de producción desde [Mercado Pago Developers](https://developers.mercadopago.com)
+2. 👤 Agregar `MERCADOPAGO_ACCESS_TOKEN` al `.env` del backend
+3. 👤 En producción: agregar la misma variable en Render Dashboard → Environment Variables
+4. [ ] Probar el flujo completo en producción
+
+### D) Migrar upload a Cloudinary 👤
 
 Las imágenes se guardan en `backend/uploads/` (efímero en Render free). CloudinaryModule ya está importado, falta conectar el endpoint `/upload` a Cloudinary en vez de disco local.
 - [ ] 👤 Conectar endpoint `/upload` a Cloudinary (ya hay módulo configurado)
@@ -276,4 +288,18 @@ cd frontend && npm run dev          # Levantar frontend
 | **Total proyecto** | **~85%** (incluye deploy pendiente) |
 
 ---
-> _Última actualización: 18/05/2026 — Seed reescrito: solo crea 1 admin, no toca productos/categorías. `npm run setup` = seed + sync. BD: 1 admin, 69 categorías, 939 productos (solo Invid). **Pendiente: subir a Render + Netlify, GitHub Action sync**_
+## 🔧 Fixes aplicados
+
+### 21/05/2026 — Gabinetes ya no filtra "Fuentes de Alimentación"
+
+**Problema:** En el home, al clickear la card "Gabinetes" (Componentes por Categoría), se marcaban 4 filtros en el catálogo: "Fuentes de Alimentación", "Gabinetes", "Gabinetes con Fuente", "Gabinetes sin Fuente". El primero (Fuentes de Alimentación) no debería aparecer porque no es un gabinete.
+
+**Causa raíz:** La keyword `'gabinete'` en la DESEADAS de Gabinetes también matcheaba la categoría `"Fuentes De Alimentacion Gabinetes Y Fuentes"` porque su nombre contiene "gabinetes". Esto agregaba el slug `fuentes-de-alimentacion-gabinetes-y-fuentes` a la URL del link.
+
+**Fix:** Agregar `slugsParaUrl` a la entrada "Gabinetes" en `DESEADAS` (`HomePage.tsx:131`) con los slugs de gabinetes exclusivamente: `['gabinetes-y-fuentes', 'gabinetes-con-fuente-gabinetes-y-fuentes', 'gabinetes-sin-fuente-gabinetes-y-fuentes']`. Esto sobreescribe los slugs del link sin afectar el conteo de productos ni el set `slugsUsados`.
+
+**Archivos modificados:** `frontend/src/pages/HomePage.tsx` (línea 131), `DOCS.md` (nueva sección "HomePage — Categorías Destacadas").
+
+---
+
+> _Última actualización: 21/05/2026 — Fix Gabinetes ya no arrastra Fuentes de Alimentación. Seed reescrito: solo crea 1 admin, no toca productos/categorías. `npm run setup` = seed + sync. BD: 1 admin, 69 categorías, 939 productos (solo Invid). **Pendiente: subir a Render + Netlify, GitHub Action sync**_

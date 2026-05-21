@@ -91,6 +91,13 @@ export const api = {
     })
   },
 
+  createMercadoPagoPreference(items: { title: string; quantity: number; unit_price: number }[]) {
+    return request<{ id: string; init_point: string; sandbox_init_point: string | null }>('/mercadopago/create-preference', {
+      method: 'POST',
+      body: JSON.stringify({ items }),
+    })
+  },
+
   async uploadFile(file: File, token: string) {
     const form = new FormData()
     form.append('file', file)
