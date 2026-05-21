@@ -8,6 +8,7 @@ import { CategoriasModule } from "./modules/categorias/categorias.module.js";
 import { ProductosModule } from "./modules/productos/productos.module.js";
 import { UploadModule } from "./modules/upload/upload.module.js";
 import { MercadoPagoModule } from "./modules/mercadopago/mercadopago.module.js";
+import { HealthModule } from "./modules/health/health.module.js";
 import { CloudinaryModule } from "./cloudinary/cloudinary.module.js";
 import { join } from "path";
 import { fileURLToPath } from "url";
@@ -32,6 +33,7 @@ const __dirname = fileURLToPath(new URL(".", import.meta.url));
     ]),
     CloudinaryModule,
     MercadoPagoModule,
+    HealthModule,
     AuthModule,
     UsersModule,
     CategoriasModule,
