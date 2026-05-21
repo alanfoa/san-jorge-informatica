@@ -1,7 +1,7 @@
 import { Link } from 'react-router-dom'
 import { useCart } from '@/hooks/useCart'
 import { WHATSAPP } from '@/lib/constants'
-import { ShoppingCart, Trash2, Plus, Minus, ArrowLeft, MessageCircle, RotateCcw } from 'lucide-react'
+import { ShoppingCart, Trash2, Plus, Minus, ArrowLeft, MessageCircle } from 'lucide-react'
 
 export function CartPage() {
   const { items, removeItem, updateQuantity, clearCart, totalItems } = useCart()
