@@ -1,7 +1,7 @@
 import { Link } from 'react-router-dom'
 import { useCart } from '@/hooks/useCart'
 import { WHATSAPP } from '@/lib/constants'
-import { ShoppingCart, Trash2, Plus, Minus, ArrowLeft, MessageCircle } from 'lucide-react'
+import { ShoppingCart, Trash2, Plus, Minus, ArrowLeft, MessageCircle, RotateCcw } from 'lucide-react'
 
 export function CartPage() {
   const { items, removeItem, updateQuantity, clearCart, totalItems } = useCart()
@@ -51,8 +51,9 @@ export function CartPage() {
           </div>
           <button
             onClick={clearCart}
-            className="px-4 py-2 text-sm text-red-400 hover:text-red-300 hover:bg-red-500/10 rounded-lg transition-all"
+            className="flex items-center gap-2 px-5 py-2.5 text-sm font-semibold text-red-400 border border-red-500/30 hover:text-white hover:bg-red-600 hover:border-red-600 rounded-xl transition-all shadow-lg shadow-red-600/10 hover:shadow-red-600/30"
           >
+            <Trash2 className="w-4 h-4" />
             Vaciar carrito
           </button>
         </div>
