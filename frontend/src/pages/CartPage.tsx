@@ -9,10 +9,18 @@ export function CartPage() {
 
   function whatsappText() {
     const lines = items.map(
-      (item, i) => `${i + 1}. ${sanitizarNombre(item.producto.nombre)} (x${item.cantidad})`
+      (item, i) => {
+        const base = `${i + 1}. ${sanitizarNombre(item.producto.nombre)} (x${item.cantidad})`
+        if (item.producto.precio > 0) {
+          return `${base} — $${(item.producto.precio * item.cantidad).toLocaleString('es-AR')}`
+        }
+        return base
+      }
     )
+    const total = items.reduce((s, i) => s + (i.producto.precio > 0 ? i.producto.precio * i.cantidad : 0), 0)
+    const totalLine = total > 0 ? `\n\nTotal: $${total.toLocaleString('es-AR')}` : ''
     return encodeURIComponent(
-      `¡Hola! Quiero consultar por este pedido:\n\n${lines.join('\n')}`
+      `¡Hola! Quiero consultar por este pedido:\n\n${lines.join('\n')}${totalLine}`
     )
   }
 
