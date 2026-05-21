@@ -2,6 +2,7 @@ import { Link } from 'react-router-dom'
 import type { Producto } from '@/types'
 import { MessageCircle, ShoppingCart } from 'lucide-react'
 import { WHATSAPP } from '@/lib/constants'
+import { sanitizarNombre } from '@/lib/sanitize'
 import { useCart } from '@/hooks/useCart'
 import { useToast } from '@/hooks/useToast'
 
@@ -10,7 +11,8 @@ interface ProductCardProps {
 }
 
 export function ProductCard({ producto }: ProductCardProps) {
-  const text = encodeURIComponent(`Hola, quiero información sobre ${producto.nombre}`)
+  const nombreLimpio = sanitizarNombre(producto.nombre)
+  const text = encodeURIComponent(`Hola, quiero información sobre ${nombreLimpio}`)
   const catNombre = producto.categoria?.nombre ?? ''
   const { addItem } = useCart()
   const { toast } = useToast()
@@ -21,7 +23,7 @@ export function ProductCard({ producto }: ProductCardProps) {
         {producto.imagen ? (
           <img
             src={producto.imagen}
-            alt={producto.nombre}
+            alt={nombreLimpio}
             className="w-full h-full object-cover group-hover:scale-110 transition-transform duration-500"
           />
         ) : (
@@ -42,7 +44,7 @@ export function ProductCard({ producto }: ProductCardProps) {
 
         <Link to={`/productos/${producto.id}`}>
           <h3 className="text-white font-semibold leading-tight hover:text-cyan-400 transition-colors break-words mb-3">
-            {producto.nombre}
+            {nombreLimpio}
           </h3>
         </Link>
 
@@ -63,7 +65,7 @@ export function ProductCard({ producto }: ProductCardProps) {
           <button
             onClick={() => {
               addItem(producto)
-              toast('success', `${producto.nombre.slice(0, 40)}… agregado al carrito`)
+              toast('success', `${nombreLimpio.slice(0, 40)}… agregado al carrito`)
             }}
             className="px-4 py-2.5 bg-gradient-to-r from-cyan-600 to-blue-700 hover:from-cyan-500 hover:to-blue-600 text-white rounded-lg font-medium flex items-center justify-center gap-2 shadow-lg shadow-cyan-600/30 hover:shadow-cyan-600/50 transition-all group/btn"
           >

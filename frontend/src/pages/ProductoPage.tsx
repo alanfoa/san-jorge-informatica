@@ -7,6 +7,7 @@ import { useCart } from '@/hooks/useCart'
 import { useToast } from '@/hooks/useToast'
 import { MessageCircle, ShoppingCart, ArrowLeft, Check, Info, ChevronLeft, ChevronRight } from 'lucide-react'
 import { WHATSAPP } from '@/lib/constants'
+import { sanitizarNombre, sanitizarDescripcion } from '@/lib/sanitize'
 
 export function ProductoPage() {
   const { id } = useParams<{ id: string }>()
@@ -38,6 +39,9 @@ export function ProductoPage() {
     setImgIdx(i => (i + 1) % galeria.length)
   }
 
+  const nombreLimpio = p ? sanitizarNombre(p.nombre) : ''
+  const descripcionLimpia = p && p.descripcion ? sanitizarDescripcion(p.descripcion) : p?.descripcion ?? ''
+
   if (isLoading) return <DetailSkeleton />
   if (isError || !p) return (
     <div className="min-h-screen bg-black pt-20 flex items-center justify-center">
@@ -48,7 +52,7 @@ export function ProductoPage() {
     </div>
   )
 
-  const text = encodeURIComponent(`Hola, quiero información sobre ${p.nombre}`)
+  const text = encodeURIComponent(`Hola, quiero información sobre ${nombreLimpio}`)
 
   return (
     <div className="min-h-screen bg-black pt-20">
@@ -64,7 +68,7 @@ export function ProductoPage() {
           <div className="space-y-4">
             <div className="relative aspect-square rounded-2xl overflow-hidden bg-gray-900 border border-cyan-500/20 group">
               {imagenActual ? (
-                <img src={imagenActual} alt={p.nombre} className="w-full h-full object-cover transition-all duration-300" />
+                <img src={imagenActual} alt={nombreLimpio} className="w-full h-full object-cover transition-all duration-300" />
               ) : (
                 <div className="w-full h-full flex items-center justify-center text-gray-500">Sin imagen</div>
               )}
@@ -124,7 +128,7 @@ export function ProductoPage() {
               )}
             </div>
 
-            <h1 className="text-4xl md:text-5xl font-bold text-white leading-tight">{p.nombre}</h1>
+            <h1 className="text-4xl md:text-5xl font-bold text-white leading-tight">{nombreLimpio}</h1>
 
             {p.precio > 0 && (
               <p className="text-4xl font-bold text-transparent bg-clip-text bg-gradient-to-r from-cyan-400 to-purple-500">
@@ -154,7 +158,7 @@ export function ProductoPage() {
               <button
                 onClick={() => {
                   addItem(p)
-                  toast('success', `${p.nombre.slice(0, 50)}… agregado al carrito`)
+                  toast('success', `${nombreLimpio.slice(0, 50)}… agregado al carrito`)
                 }}
                 className="w-full px-8 py-4 bg-gradient-to-r from-cyan-600 to-blue-700 hover:from-cyan-500 hover:to-blue-600 text-white rounded-xl font-bold text-lg flex items-center justify-center gap-3 shadow-xl shadow-cyan-600/50 hover:shadow-cyan-600/70 hover:scale-105 transition-all group"
               >
@@ -197,7 +201,7 @@ export function ProductoPage() {
             </h3>
             <div
               className="text-gray-300 text-sm leading-relaxed prose prose-invert max-w-none [&_table]:w-full [&_table]:border-collapse [&_td]:border [&_td]:border-cyan-500/20 [&_td]:px-3 [&_td]:py-2 [&_th]:border [&_th]:border-cyan-500/20 [&_th]:px-3 [&_th]:py-2 [&_th]:bg-cyan-500/10 [&_th]:text-cyan-400 [&_td]:text-gray-300"
-              dangerouslySetInnerHTML={{ __html: p.descripcion }}
+              dangerouslySetInnerHTML={{ __html: descripcionLimpia }}
             />
           </div>
         )}

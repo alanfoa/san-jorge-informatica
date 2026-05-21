@@ -41,6 +41,27 @@ function normalizeSlug(slug: string): string {
   return SLUG_MAP[slug] || slug.toLowerCase().replace(/[^a-z0-9-]/g, "-");
 }
 
+const BANNED_WORDS = ['Kelyx', 'Invid Computers'];
+
+function sanitizarNombre(nombre: string): string {
+  let res = nombre;
+  for (const word of BANNED_WORDS) {
+    const regex = new RegExp(word.replace(/[.*+?^${}()|[\]\\]/g, '\\$&'), 'gi');
+    res = res.replace(regex, '');
+  }
+  res = res.replace(/\s*\(\d+\)\s*$/, '');
+  return res.replace(/\s+/g, ' ').trim();
+}
+
+function sanitizarDescripcion(descripcion: string): string {
+  let res = descripcion;
+  for (const word of BANNED_WORDS) {
+    const regex = new RegExp(word.replace(/[.*+?^${}()|[\]\\]/g, '\\$&'), 'gi');
+    res = res.replace(regex, '');
+  }
+  return res;
+}
+
 async function main() {
   console.log("=" .repeat(60));
   console.log("Importador Invid → San Jorge Informática");
@@ -138,10 +159,13 @@ async function main() {
       continue;
     }
 
-    // Buscar producto existente por nombre
-    const existing = await prodRepo.findOne({
-      where: { nombre: p.nombre },
-    });
+    // Buscar producto existente por SKU o nombre sanitizado
+    const nombreSanitizado = sanitizarNombre(p.nombre);
+    const descripcionSanitizada = sanitizarDescripcion(p.descripcion || "");
+
+    const existing = p.sku
+      ? await prodRepo.findOne({ where: { sku: p.sku } })
+      : await prodRepo.findOne({ where: { nombre: nombreSanitizado } });
 
     if (existing) {
       // Actualizar si hay cambios
@@ -154,8 +178,12 @@ async function main() {
         existing.precio = p.precio;
         changed = true;
       }
-      if (p.descripcion && existing.descripcion !== p.descripcion) {
-        existing.descripcion = p.descripcion;
+      if (existing.nombre !== nombreSanitizado) {
+        existing.nombre = nombreSanitizado;
+        changed = true;
+      }
+      if (existing.descripcion !== descripcionSanitizada) {
+        existing.descripcion = descripcionSanitizada;
         changed = true;
       }
       if (changed) {
@@ -169,8 +197,8 @@ async function main() {
 
     // Crear nuevo producto
     const prod = prodRepo.create({
-      nombre: p.nombre,
-      descripcion: p.descripcion || "",
+      nombre: nombreSanitizado,
+      descripcion: descripcionSanitizada,
       precio: p.precio || 0,
       imagen: p.imagen || "",
       activo: true,

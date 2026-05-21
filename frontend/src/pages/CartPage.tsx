@@ -1,6 +1,7 @@
 import { Link } from 'react-router-dom'
 import { useCart } from '@/hooks/useCart'
 import { WHATSAPP } from '@/lib/constants'
+import { sanitizarNombre } from '@/lib/sanitize'
 import { ShoppingCart, Trash2, Plus, Minus, ArrowLeft, MessageCircle } from 'lucide-react'
 
 export function CartPage() {
@@ -8,7 +9,7 @@ export function CartPage() {
 
   function whatsappText() {
     const lines = items.map(
-      (item, i) => `${i + 1}. ${item.producto.nombre} (x${item.cantidad})`
+      (item, i) => `${i + 1}. ${sanitizarNombre(item.producto.nombre)} (x${item.cantidad})`
     )
     return encodeURIComponent(
       `¡Hola! Quiero consultar por este pedido:\n\n${lines.join('\n')}`
@@ -66,7 +67,7 @@ export function CartPage() {
             >
               <Link to={`/productos/${item.producto.id}`} className="w-20 h-20 rounded-lg overflow-hidden bg-gray-800 flex-shrink-0">
                 {item.producto.imagen ? (
-                  <img src={item.producto.imagen} alt={item.producto.nombre} className="w-full h-full object-cover" />
+                  <img src={item.producto.imagen} alt={sanitizarNombre(item.producto.nombre)} className="w-full h-full object-cover" />
                 ) : (
                   <div className="w-full h-full flex items-center justify-center text-gray-600 text-xs">Sin img</div>
                 )}
@@ -74,7 +75,7 @@ export function CartPage() {
 
               <div className="flex-1 min-w-0">
                 <Link to={`/productos/${item.producto.id}`} className="text-white font-medium hover:text-cyan-400 transition-colors line-clamp-1">
-                  {item.producto.nombre}
+                  {sanitizarNombre(item.producto.nombre)}
                 </Link>
                 {item.producto.precio > 0 && (
                   <p className="text-cyan-400 text-sm font-bold mt-1">
