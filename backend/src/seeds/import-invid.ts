@@ -219,6 +219,18 @@ async function main() {
       imgCreated++;
     }
 
+    // Agregar imágenes extra del detalle
+    if (p.imagenes_extra && Array.isArray(p.imagenes_extra)) {
+      for (const imgUrl of p.imagenes_extra) {
+        const img = new ProductoImagen();
+        img.url = imgUrl;
+        img.orden = 1;
+        img.productoId = saved.id;
+        await ds.getRepository(ProductoImagen).save(img);
+        imgCreated++;
+      }
+    }
+
     // Agregar caracteristicas reales (specs scrapeadas)
     if (p.caracteristicas && Array.isArray(p.caracteristicas)) {
       for (const spec of p.caracteristicas) {

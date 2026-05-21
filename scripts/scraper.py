@@ -177,10 +177,14 @@ def scrape_category(cat_url: str, cat_slug: str) -> list[dict]:
     return products
 
 
-def scrape_description(url: str) -> str:
-    """Fetches a product detail page and extracts description from <meta name='Description' content='...'>."""
+def scrape_detail(url: str, main_image: str = "") -> tuple[str, list[str]]:
+    """Fetches a product detail page and extracts description and extra images."""
+    desc = ""
+    extra_images = []
     try:
         html = fetch(url)
+
+        # Extraer descripcion del meta tag
         match = re.search(
             r'<meta[^>]*name="Description"[^>]*content="([^"]*)"',
             html,
@@ -188,10 +192,28 @@ def scrape_description(url: str) -> str:
         )
         if match:
             desc = _html.unescape(match.group(1).strip())
-            return desc
+
+        # Extraer todas las imagenes de la pagina de detalle
+        all_imgs = re.findall(
+            r'<img[^>]*src="(https://[^"]+)"',
+            html,
+        )
+        # Filtrar: excluir la imagen principal, thumbnails tiny, iconos y logo
+        for img_url in all_imgs:
+            if img_url == main_image:
+                continue
+            if "/thumb/" in img_url:
+                continue
+            if any(x in img_url.lower() for x in ["logo", "icon", "banner", "facebook", "instagram", "whatsapp"]):
+                continue
+            extra_images.append(img_url)
+
+        extra_images = list(set(extra_images))
+
     except Exception as e:
-        logger.warning(f"  Error obteniendo descripción de {url}: {e}")
-    return ""
+        logger.warning(f"  Error obteniendo detalle de {url}: {e}")
+
+    return desc, extra_images
 
 
 def normalize_slug(slug: str) -> str:
@@ -259,20 +281,24 @@ def main():
         if i < len(categories):
             time.sleep(REQUEST_DELAY)
 
-    # 3. Obtener descripciones de las páginas de detalle
-    logger.info("Obteniendo descripciones de productos...")
+    # 3. Obtener descripciones e imágenes adicionales de las páginas de detalle
+    logger.info("Obteniendo descripciones e imágenes de productos...")
     desc_count = 0
+    img_count = 0
     for i, p in enumerate(all_products, 1):
-        desc = scrape_description(p["url_origen"])
+        desc, extra_imgs = scrape_detail(p["url_origen"], p.get("imagen", ""))
         if desc:
             p["descripcion"] = desc
             desc_count += 1
+        if extra_imgs:
+            p["imagenes_extra"] = extra_imgs
+            img_count += len(extra_imgs)
         if i % 50 == 0 or i == len(all_products):
-            logger.info(f"  Descripciones: {i}/{len(all_products)} ({desc_count} obtenidas)")
+            logger.info(f"  Procesados: {i}/{len(all_products)} (desc: {desc_count}, imgs extra: {img_count})")
         if i < len(all_products):
             time.sleep(DETAIL_DELAY)
 
-    logger.info(f"Descripciones obtenidas: {desc_count}/{len(all_products)}")
+    logger.info(f"Descripciones obtenidas: {desc_count}, imágenes extra: {img_count}")
 
     # 4. Guardar resultado
     os.makedirs(os.path.dirname(OUTPUT_PATH), exist_ok=True)
