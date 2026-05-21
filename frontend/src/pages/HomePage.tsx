@@ -130,6 +130,7 @@ export function HomePage() {
     { nombre: 'Fuentes', keywords: ['fuente', 'fuente de alimentacion'] },
     { nombre: 'Gabinetes', keywords: ['gabinete'] },
     { nombre: 'Mothers', keywords: ['mother', 'motherboard', 'placa madre'] },
+    { nombre: 'Periféricos', keywords: ['periferico', 'teclado', 'mouse'] },
   ]
   const catList = [...catMap.values()]
   const slugsUsados = new Set<string>()
@@ -236,11 +237,11 @@ export function HomePage() {
           </div>
 
           <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-4 gap-6">
-            {topCats.map((cat, i) => { return (
+            {topCats.map((cat) => { return (
                 <Link
                   key={cat.slugs[0]}
                   to={`/productos?${cat.slugs.map(s => `categoria=${encodeURIComponent(s)}`).join('&')}`}
-                  className={`group relative bg-gradient-to-br from-gray-900/90 to-gray-800/90 backdrop-blur-sm rounded-2xl border border-cyan-500/20 hover:border-cyan-500/60 p-8 transition-all duration-300 hover:shadow-xl hover:shadow-cyan-500/20 hover:-translate-y-2 ${i === 4 ? 'lg:col-start-2' : ''}`}
+                  className="group relative bg-gradient-to-br from-gray-900/90 to-gray-800/90 backdrop-blur-sm rounded-2xl border border-cyan-500/20 hover:border-cyan-500/60 p-8 transition-all duration-300 hover:shadow-xl hover:shadow-cyan-500/20 hover:-translate-y-2"
                 >
                   <div className="text-cyan-400 mb-4 group-hover:scale-110 group-hover:text-cyan-300 transition-all">
                     {iconoParaCategoria(nombreLimpio(cat.nombre))}
