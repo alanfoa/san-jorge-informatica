@@ -88,7 +88,29 @@
 - [ ] Probar ejecución manual (`workflow_dispatch`)
 - [ ] Verificar que Render redeploya tras push del scraper
 
-### C) Mercado Pago — Pendiente 👤
+### C) Migración a PostgreSQL (persistencia de datos) 🔧
+
+**Problema:** Render free tier tiene disco efímero. Cada deploy destruye `data.db` (SQLite). Los cambios hechos desde admin (precios, stock, activar/desactivar) se pierden.
+
+**Solución:** Migrar a PostgreSQL en Supabase (free tier). Los datos viven fuera de Render, sobreviven cualquier deploy.
+
+**Prerequisito:** 👤 Crear cuenta en [supabase.com](https://supabase.com) → New project → copiar Connection string
+
+**Archivos a modificar:**
+- `backend/package.json` — agregar `pg`, eliminar `sql.js`
+- `backend/src/app.module.ts` — TypeORM condicional (PG en prod, SQLite en dev)
+- `backend/src/database/data-source.ts` — Ídem
+- `backend/src/seeds/seed.ts` — DataSource dinámico
+- `backend/src/seeds/import-invid.ts` — Sync no destructivo + soporte PG
+- `backend/src/seeds/add-users.ts` — Reescribir con TypeORM (hoy usa sql.js nativo)
+- `backend/scripts/seed.ts` — Eliminar (legacy sql.js sin TypeORM)
+- `backend/src/modules/productos/productos.service.ts` — `Like` → `ILike`
+- `render.yaml` — Sacar sync del startCommand, agregar `DATABASE_URL`
+- `.env.example` — Agregar `DATABASE_URL`
+
+**Detalles en:** `DOCS.md` sección "PENDIENTE — Migración a PostgreSQL"
+
+### D) Mercado Pago — Pendiente 👤
 
 La lógica ya está implementada:
 - **Backend**: `POST /mercadopago/create-preference` en `backend/src/modules/mercadopago/`
@@ -100,12 +122,14 @@ La lógica ya está implementada:
 3. 👤 En producción: agregar la misma variable en Render Dashboard → Environment Variables
 4. [ ] Probar el flujo completo en producción
 
-### D) Migrar upload a Cloudinary 👤
+**Detalles en:** `DOCS.md` sección "PENDIENTE — Mercado Pago"
+
+### E) Migrar upload a Cloudinary 👤
 
 Las imágenes se guardan en `backend/uploads/` (efímero en Render free). CloudinaryModule ya está importado, falta conectar el endpoint `/upload` a Cloudinary en vez de disco local.
 - [ ] 👤 Conectar endpoint `/upload` a Cloudinary (ya hay módulo configurado)
 
-### D) Mejoras opcionales del catálogo
+### F) Mejoras opcionales del catálogo
 
 - [ ] Agregar campo `precio` a los productos de Invid (actualmente todos "Consultar")
 - [ ] Agregar `descripción` completa (scrapeada de la página de detalle del producto)
@@ -114,7 +138,7 @@ Las imágenes se guardan en `backend/uploads/` (efímero en Render free). Cloudi
 - [ ] Ordenar productos por nombre/precio en el frontend
 - [ ] Agregar búsqueda por SKU
 
-### E) Seguridad
+### G) Seguridad
 
 - [x] Rate limiting en `/auth/login` (5 requests/minuto vía `@nestjs/throttler`)
 - [ ] 👤 Cambiar `JWT_SECRET` actual (`sanjorge-secret-cambiar-en-produccion`) por uno seguro
@@ -302,4 +326,4 @@ cd frontend && npm run dev          # Levantar frontend
 
 ---
 
-> _Última actualización: 21/05/2026 — Fix Gabinetes ya no arrastra Fuentes de Alimentación. Seed reescrito: solo crea 1 admin, no toca productos/categorías. `npm run setup` = seed + sync. BD: 1 admin, 69 categorías, 939 productos (solo Invid). **Pendiente: subir a Render + Netlify, GitHub Action sync**_
+> _Última actualización: 21/05/2026 — Fix Gabinetes slugs + Mercado Pago implementado (falta token) + plan migración PostgreSQL documentado_

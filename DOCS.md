@@ -205,6 +205,75 @@ Se usa cuando los keywords matchean categorías cuyo nombre contiene substrings 
 
 `CLEAN_NAMES` (líneas 29-99) mapea nombres originales de categorías (ej: `"Fuentes De Alimentacion Gabinetes Y Fuentes"`) a nombres limpios de display (ej: `"Fuentes de Alimentación"`). Se usa tanto en HomePage como en ProductosPage.
 
+---
+
+## 🚧 PENDIENTE — Migración a PostgreSQL
+
+### Problema
+
+Render free tier tiene **almacenamiento efímero**. Cada deploy destruye el contenedor y con él la base de datos `data.db` (SQLite). Aunque el sync de Invid repuebla los productos, **cualquier cambio hecho desde el admin** (precios, stock, activar/desactivar productos, destacados) **se pierde en cada deploy**.
+
+### Solución
+
+Migrar de `sql.js` (SQLite embebido) a **PostgreSQL externo** (Supabase free tier). Los datos viven fuera de Render y sobreviven cualquier deploy.
+
+### Prerequisito
+
+1. Crear cuenta gratis en [supabase.com](https://supabase.com)
+2. Crear proyecto → Settings → Database → copiar **Connection string** (`postgresql://...`)
+3. Poner ese string en la variable de entorno `DATABASE_URL` del backend
+
+### Cambios de código necesarios
+
+| Archivo | Cambio |
+|---------|--------|
+| `backend/package.json` | Agregar `pg` driver, eliminar `sql.js` |
+| `backend/src/app.module.ts` | TypeORM condicional: si `DATABASE_URL` → PostgreSQL, si no → SQLite (dev) |
+| `backend/src/database/data-source.ts` | Ídem, para CLI |
+| `backend/src/seeds/seed.ts` | DataSource dinámico según entorno |
+| `backend/src/seeds/import-invid.ts` | **Sync no destructivo**: no pisar `precio`, `activo`, `destacado`, `stock` si el usuario los modificó. Soporte PostgreSQL. |
+| `backend/src/seeds/add-users.ts` | Reescribir usando TypeORM (hoy usa sql.js nativo) |
+| `backend/scripts/seed.ts` | **Eliminar** (legacy, usa sql.js nativo sin TypeORM) |
+| `backend/src/modules/productos/productos.service.ts` | `Like` → `ILike` (case-insensitive en PostgreSQL) |
+| `render.yaml` | Sacar `&& sync:prod` del startCommand. Agregar env var `DATABASE_URL` |
+| `.env.example` | Agregar `DATABASE_URL` |
+
+### Flujo post-migración
+
+```
+Deploy:
+  1. Render arranca contenedor
+  2. npm run seed:prod  → Crea tablas + admin (solo si no existen)
+  3. npm run start:prod → App conecta a Supabase → datos persistentes
+
+Sync Invid (solo cuando haya productos nuevos, NO en cada deploy):
+  npm run sync  (no destructivo: NO pisará datos editados por el usuario)
+```
+
+---
+
+## 🚧 PENDIENTE — Mercado Pago
+
+### Estado actual
+
+El código ya está implementado:
+- **Backend**: `POST /mercadopago/create-preference` en `backend/src/modules/mercadopago/`
+- **Frontend**: Botón "Pagar con Mercado Pago" en CartPage (visible solo si hay items con `precio > 0`)
+
+### Para activarlo
+
+1. Obtener **Access Token** de producción desde [developers.mercadopago.com](https://developers.mercadopago.com) (misma cuenta que la app Mercado Pago)
+2. Agregar `MERCADOPAGO_ACCESS_TOKEN=APP_USR-...` al `.env` del backend
+3. En producción: agregar la misma variable en Render Dashboard → Environment Variables
+
+### Comportamiento
+
+- Si no hay token configurado, el botón no se muestra (porque ningún producto tiene precio aún)
+- Cuando hay token + productos con precio, el botón crea una preferencia de pago y abre Checkout Pro en otra pestaña
+- Al pagar, redirige de vuelta al catálogo
+
+---
+
 ## Convenciones de código
 
 - No agregar comentarios a menos que se solicite explícitamente
