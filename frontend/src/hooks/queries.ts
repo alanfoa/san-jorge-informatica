@@ -15,7 +15,7 @@ export function useProductos() {
   return useQuery({
     queryKey: ['productos'],
     queryFn: api.getProductos,
-    staleTime: 30 * 1000,
+    staleTime: 5 * 60 * 1000,
   })
 }
 
@@ -23,7 +23,7 @@ export function useProductosActivos() {
   return useQuery({
     queryKey: ['productos', 'activos'],
     queryFn: api.getProductosActivos,
-    staleTime: 30 * 1000,
+    staleTime: 5 * 60 * 1000,
   })
 }
 

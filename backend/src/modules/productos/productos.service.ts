@@ -33,18 +33,18 @@ export class ProductosService {
     if (query?.activo !== undefined) where.activo = query.activo;
     if (query?.destacado !== undefined) where.destacado = query.destacado;
 
-    // Lógica para búsqueda por nombre o SKU
     const like = usePostgres() ? ILike : Like;
     if (query?.search) {
       where.nombre = like(`%${query.search}%`);
-    } else if (query?.sku) {
+    }
+    if (query?.sku) {
       where.sku = like(`%${query.sku}%`);
     }
 
     return this.productosRepository.find({
       where,
-      relations: ["categoria", "imagenes", "caracteristicas"],
-      order: { created_at: "DESC" }, // Ordenar por fecha de creación descendente
+      relations: ["categoria"],
+      order: { created_at: "DESC" },
     });
   }
 

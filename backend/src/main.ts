@@ -1,4 +1,5 @@
 import "reflect-metadata";
+import compression from "compression";
 import { NestFactory } from "@nestjs/core";
 import { ValidationPipe } from "@nestjs/common";
 import { NestExpressApplication } from "@nestjs/platform-express";
@@ -20,6 +21,8 @@ async function bootstrap() {
     ],
     credentials: true,
   });
+
+  app.use(compression());
 
   app.useStaticAssets(join(__dirname, "..", "uploads"), {
     prefix: "/uploads",

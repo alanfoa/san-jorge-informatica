@@ -1,8 +1,12 @@
 import {
   Entity, PrimaryGeneratedColumn, Column, CreateDateColumn, UpdateDateColumn,
-  ManyToOne, JoinColumn, OneToMany,
+  ManyToOne, JoinColumn, OneToMany, Index,
 } from "typeorm";
 
+@Index("idx_productos_activo", ["activo"])
+@Index("idx_productos_categoria_id", ["categoriaId"])
+@Index("idx_productos_created_at", ["created_at"])
+@Index("idx_productos_sku", ["sku"])
 @Entity("productos")
 export class Producto {
   @PrimaryGeneratedColumn()
@@ -60,6 +64,7 @@ export interface Categoria {
   productos: Producto[];
 }
 
+@Index("idx_producto_imagenes_producto_id", ["productoId"])
 @Entity("producto_imagenes")
 export class ProductoImagen {
   @PrimaryGeneratedColumn()
@@ -79,6 +84,7 @@ export class ProductoImagen {
   productoId: number;
 }
 
+@Index("idx_caracteristicas_producto_id", ["productoId"])
 @Entity("caracteristicas")
 export class Caracteristica {
   @PrimaryGeneratedColumn()
