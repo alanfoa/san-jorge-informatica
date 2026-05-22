@@ -5,6 +5,7 @@ import { DetailSkeleton } from '@/components/DetailSkeleton'
 import { useProducto, useProductosActivos } from '@/hooks/queries'
 import { useCart } from '@/hooks/useCart'
 import { useToast } from '@/hooks/useToast'
+import { formatPrice } from '@/lib/format'
 import { MessageCircle, ShoppingCart, ArrowLeft, Check, Info, ChevronLeft, ChevronRight } from 'lucide-react'
 import { WHATSAPP } from '@/lib/constants'
 import { sanitizarNombre, sanitizarDescripcion } from '@/lib/sanitize'
@@ -130,9 +131,9 @@ export function ProductoPage() {
 
             <h1 className="text-4xl md:text-5xl font-bold text-white leading-tight">{nombreLimpio}</h1>
 
-            {p.precio > 0 && (
+            {Number(p.precio) > 0 && (
               <p className="text-4xl font-bold text-transparent bg-clip-text bg-gradient-to-r from-cyan-400 to-purple-500">
-                ${p.precio.toLocaleString('es-AR')}
+                ${formatPrice(p.precio)}
               </p>
             )}
 

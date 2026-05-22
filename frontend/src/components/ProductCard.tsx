@@ -1,5 +1,6 @@
 import { Link } from 'react-router-dom'
 import type { Producto } from '@/types'
+import { formatPrice } from '@/lib/format'
 import { MessageCircle, ShoppingCart } from 'lucide-react'
 import { WHATSAPP } from '@/lib/constants'
 import { sanitizarNombre } from '@/lib/sanitize'
@@ -48,8 +49,8 @@ export function ProductCard({ producto }: ProductCardProps) {
           </h3>
         </Link>
 
-        {producto.precio > 0 && (
-          <p className="text-white font-bold text-lg">${producto.precio.toLocaleString('es-AR')}</p>
+        {Number(producto.precio) > 0 && (
+          <p className="text-white font-bold text-lg">${formatPrice(producto.precio)}</p>
         )}
 
         <div className="flex gap-2 pt-1">

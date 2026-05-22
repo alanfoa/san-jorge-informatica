@@ -4,6 +4,7 @@ import { TableSkeleton } from '@/components/TableSkeleton'
 import { useProductos, useDeleteProducto } from '@/hooks/queries'
 import { useToast } from '@/hooks/useToast'
 import { api } from '@/api/client'
+import { formatPrice } from '@/lib/format'
 import { Loader2, RefreshCw } from 'lucide-react'
 
 export function AdminPage() {
@@ -106,7 +107,7 @@ export function AdminPage() {
                     <td className="py-3 px-4 text-gray-400">{p.id}</td>
                     <td className="py-3 px-4 font-medium text-white">{p.nombre}</td>
                     <td className="py-3 px-4 text-gray-300">{catNombre}</td>
-                    <td className="py-3 px-4 text-cyan-300">${p.precio.toLocaleString('es-AR')}</td>
+                    <td className="py-3 px-4 text-cyan-300">${formatPrice(p.precio)}</td>
                     <td className="py-3 px-4">{p.activo ? <span className="text-green-400">✓</span> : <span className="text-red-400">✗</span>}</td>
                     <td className="py-3 px-4 flex gap-2">
                       <Link to={`/admin/editar/${p.id}`} className="text-cyan-400 hover:text-cyan-300 text-sm font-medium">Editar</Link>

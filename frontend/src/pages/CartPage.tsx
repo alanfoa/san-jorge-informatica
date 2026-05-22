@@ -4,6 +4,7 @@ import { useCart } from '@/hooks/useCart'
 import { useToast } from '@/hooks/useToast'
 import { WHATSAPP } from '@/lib/constants'
 import { sanitizarNombre } from '@/lib/sanitize'
+import { formatPrice } from '@/lib/format'
 import { api } from '@/api/client'
 import { ShoppingCart, Trash2, Plus, Minus, ArrowLeft, MessageCircle, CreditCard, Loader2 } from 'lucide-react'
 
@@ -54,13 +55,13 @@ export function CartPage() {
       (item, i) => {
         const base = `${i + 1}. ${sanitizarNombre(item.producto.nombre)} (x${item.cantidad})`
         if (Number(item.producto.precio) > 0) {
-          return `${base} — $${(Number(item.producto.precio) * item.cantidad).toLocaleString('es-AR')}`
+          return `${base} — $${formatPrice(Number(item.producto.precio) * item.cantidad)}`
         }
         return base
       }
     )
     const total = items.reduce((s, i) => s + (Number(i.producto.precio) > 0 ? Number(i.producto.precio) * i.cantidad : 0), 0)
-    const totalLine = total > 0 ? `\n\nTotal: $${total.toLocaleString('es-AR')}` : ''
+    const totalLine = total > 0 ? `\n\nTotal: $${formatPrice(total)}` : ''
     return encodeURIComponent(
       `¡Hola! Quiero consultar por este pedido:\n\n${lines.join('\n')}${totalLine}`
     )
@@ -131,7 +132,7 @@ export function CartPage() {
                 </Link>
                 {Number(item.producto.precio) > 0 && (
                   <p className="text-cyan-400 text-sm font-bold mt-1">
-                    ${(Number(item.producto.precio) * item.cantidad).toLocaleString('es-AR')}
+                    ${formatPrice(Number(item.producto.precio) * item.cantidad)}
                   </p>
                 )}
               </div>
@@ -165,7 +166,7 @@ export function CartPage() {
         <div className="bg-gradient-to-r from-cyan-500/10 to-purple-500/10 border border-cyan-500/20 rounded-2xl p-6 text-center">
           {itemsConPrecio.length > 0 ? (
             <p className="text-cyan-300 font-semibold text-lg mb-4">
-              Total a pagar: ${totalMp.toLocaleString('es-AR')}
+              Total a pagar: ${formatPrice(totalMp)}
             </p>
           ) : (
             <p className="text-gray-400 mb-4">Los precios y disponibilidad se confirmarán al enviar la consulta</p>
