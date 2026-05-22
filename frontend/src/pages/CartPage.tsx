@@ -131,7 +131,7 @@ export function CartPage() {
                 </Link>
                 {Number(item.producto.precio) > 0 && (
                   <p className="text-cyan-400 text-sm font-bold mt-1">
-                    ${Number(item.producto.precio).toLocaleString('es-AR')}
+                    ${(Number(item.producto.precio) * item.cantidad).toLocaleString('es-AR')}
                   </p>
                 )}
               </div>
@@ -163,7 +163,7 @@ export function CartPage() {
         </div>
 
         <div className="bg-gradient-to-r from-cyan-500/10 to-purple-500/10 border border-cyan-500/20 rounded-2xl p-6 text-center">
-          {mostrarMp ? (
+          {itemsConPrecio.length > 0 ? (
             <p className="text-cyan-300 font-semibold text-lg mb-4">
               Total a pagar: ${totalMp.toLocaleString('es-AR')}
             </p>
