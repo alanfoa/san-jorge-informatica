@@ -5,6 +5,6 @@ export class LoginDto {
   email: string;
 
   @IsString()
-  @MinLength(4, { message: "Contraseña muy corta" })
+  @MinLength(8, { message: "Contraseña muy corta" })
   password: string;
 }

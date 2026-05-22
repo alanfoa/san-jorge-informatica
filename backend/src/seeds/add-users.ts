@@ -41,17 +41,13 @@ async function main() {
     return;
   }
 
-  // Create users
-  const adminPass = await bcrypt.hash("Academia01", 10);
-  const editorPass = await bcrypt.hash("editor123", 10);
+  // Create admin user
+  const adminPassword = process.env.ADMIN_PASSWORD || "Academia01";
+  const adminPass = await bcrypt.hash(adminPassword, 12);
 
   await ds.query(
     "INSERT INTO users (nombre, email, password, rol, activo) VALUES (?, ?, ?, ?, 1)",
     ["Administrador", "sanjorgeinf@hotmail.com", adminPass, "admin"]
-  );
-  await ds.query(
-    "INSERT INTO users (nombre, email, password, rol, activo) VALUES (?, ?, ?, ?, 1)",
-    ["Editor", "editor@sanjorge.com", editorPass, "editor"]
   );
 
   // Export and save
@@ -59,7 +55,7 @@ async function main() {
   const data = driver.database.export();
   writeFileSync(DB_PATH, Buffer.from(data));
 
-  console.log("✓ 2 usuarios creados");
+  console.log("✓ 1 usuario admin creado");
   await ds.destroy();
 }
 

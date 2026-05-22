@@ -16,10 +16,10 @@ export class AuthService {
   async login(email: string, password: string) {
     const user = await this.usersRepository.findOne({ where: { email } });
     if (!user) throw new UnauthorizedException("Credenciales inválidas");
+    if (!user.activo) throw new UnauthorizedException("Credenciales inválidas");
 
     const valid = await bcrypt.compare(password, user.password);
     if (!valid) throw new UnauthorizedException("Credenciales inválidas");
-    if (!user.activo) throw new UnauthorizedException("Usuario inactivo");
 
     const payload = { sub: user.id, email: user.email, role: user.rol };
     return {

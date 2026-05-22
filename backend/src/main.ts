@@ -1,5 +1,6 @@
 import "reflect-metadata";
 import compression from "compression";
+import helmet from "helmet";
 import { NestFactory } from "@nestjs/core";
 import { ValidationPipe } from "@nestjs/common";
 import { NestExpressApplication } from "@nestjs/platform-express";
@@ -23,12 +24,17 @@ async function bootstrap() {
   });
 
   app.use(compression());
+  app.use(helmet());
 
   app.useStaticAssets(join(__dirname, "..", "uploads"), {
     prefix: "/uploads",
   });
 
   app.useGlobalPipes(new ValidationPipe({ transform: true, whitelist: true }));
+
+  if (process.env.NODE_ENV === "production") {
+    app.enable("trust proxy");
+  }
 
   const port = process.env.PORT || 3001;
   await app.listen(port);

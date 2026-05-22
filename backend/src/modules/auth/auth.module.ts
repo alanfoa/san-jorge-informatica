@@ -18,7 +18,7 @@ import { User } from "../users/entities/user.entity.js";
       inject: [ConfigService],
       useFactory: (config: ConfigService) => ({
         secret: config.get("JWT_SECRET"),
-        signOptions: { expiresIn: "24h" },
+        signOptions: { expiresIn: "12h" },
       }),
     }),
   ],

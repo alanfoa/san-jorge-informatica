@@ -21,7 +21,7 @@ export class UsersService {
     });
     if (exists) throw new ConflictException("El email ya está registrado");
 
-    const hashed = await bcrypt.hash(dto.password, 10);
+    const hashed = await bcrypt.hash(dto.password, 12);
     const user = this.usersRepository.create({
       ...dto,
       password: hashed,
@@ -48,7 +48,7 @@ export class UsersService {
     if (!user) throw new NotFoundException("Usuario no encontrado");
 
     if (dto.password) {
-      dto.password = await bcrypt.hash(dto.password, 10);
+      dto.password = await bcrypt.hash(dto.password, 12);
     }
     if (dto.email && dto.email !== user.email) {
       const exists = await this.usersRepository.findOne({

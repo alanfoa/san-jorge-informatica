@@ -26,7 +26,8 @@ async function seed() {
   if (existing) {
     console.log("✓ Usuario admin ya existe (email: sanjorgeinf@hotmail.com)");
   } else {
-    const pass = await bcrypt.hash("Academia01", 10);
+    const adminPassword = process.env.ADMIN_PASSWORD || "Academia01";
+    const pass = await bcrypt.hash(adminPassword, 12);
     await userRepo.save(
       userRepo.create({
         nombre: "Administrador",
@@ -36,7 +37,7 @@ async function seed() {
         activo: true,
       })
     );
-    console.log("✓ Usuario admin creado (email: sanjorgeinf@hotmail.com / pass: Academia01)");
+    console.log("✓ Usuario admin creado");
   }
 
   await ds.destroy();
