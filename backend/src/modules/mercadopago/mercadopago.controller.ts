@@ -2,7 +2,6 @@ import {
   Controller, Post, Get, Body, BadRequestException,
   InternalServerErrorException, HttpCode,
 } from "@nestjs/common";
-import { ConfigService } from "@nestjs/config";
 import { MercadoPagoConfig, Preference } from "mercadopago";
 import { CreatePreferenceDto } from "./dto/create-preference.dto.js";
 
@@ -13,8 +12,8 @@ export class MercadoPagoController {
   private client: MercadoPagoConfig | null = null;
   private readonly isTestMode: boolean;
 
-  constructor(private readonly config: ConfigService) {
-    const token = this.config.get<string>("MERCADOPAGO_ACCESS_TOKEN");
+  constructor() {
+    const token = process.env.MERCADOPAGO_ACCESS_TOKEN;
     if (token) {
       this.client = new MercadoPagoConfig({ accessToken: token });
       this.isTestMode = token.startsWith("TEST-");
@@ -37,7 +36,7 @@ export class MercadoPagoController {
       );
     }
 
-    const frontendUrl = (this.config.get<string>("CORS_ORIGIN") || "http://localhost:5173")
+    const frontendUrl = (process.env.CORS_ORIGIN || "http://localhost:5173")
       .split(",")[0]
       .trim()
       .replace(/\/$/, "");
