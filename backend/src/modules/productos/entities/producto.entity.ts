@@ -32,6 +32,9 @@ export class Producto {
   @Column("int", { default: 0 })
   stock: number;
 
+  @Column("boolean", { default: false })
+  protegido: boolean;
+
   @ManyToOne("Categoria", "productos")
   @JoinColumn({ name: "categoriaId" })
   categoria: Categoria;

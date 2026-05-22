@@ -5,6 +5,7 @@ import {
 import { ProductosService } from "./productos.service.js";
 import { CreateProductoDto } from "./dto/create-producto.dto.js";
 import { UpdateProductoDto } from "./dto/update-producto.dto.js";
+import { RestoreBackupDto } from "./dto/restore-backup.dto.js";
 import { JwtAuthGuard } from "../../common/guards/jwt-auth.guard.js";
 import { RolesGuard } from "../../common/guards/roles.guard.js";
 import { Roles } from "../../common/guards/roles.decorator.js";
@@ -62,5 +63,12 @@ export class ProductosController {
   @Roles("admin")
   remove(@Param("id", ParseIntPipe) id: number) {
     return this.productosService.remove(id);
+  }
+
+  @Post("restore-backup")
+  @UseGuards(JwtAuthGuard, RolesGuard)
+  @Roles("admin")
+  restoreBackup(@Body() dto: RestoreBackupDto) {
+    return this.productosService.restoreFromBackup(dto);
   }
 }

@@ -1,39 +1,40 @@
 import "reflect-metadata";
-import { DataSource } from "typeorm";
-import { join } from "path";
-import { fileURLToPath } from "url";
+import "dotenv/config";
 import bcrypt from "bcryptjs";
-
-const __dirname = fileURLToPath(new URL(".", import.meta.url));
+import { User } from "../modules/users/entities/user.entity.js";
+import { createSeedDataSource } from "../database/create-data-source.js";
+import { usePostgres } from "../database/typeorm.config.js";
+import { ensureProtegidoColumn } from "./ensure-schema.js";
 
 async function seed() {
-  const ds = new DataSource({
-    type: "sqljs",
-    location: join(__dirname, "..", "..", "data.db"),
-    autoSave: true,
-    synchronize: true,
-    entities: [join(__dirname, "..", "**", "*.entity.{ts,js}")],
-  });
+  const ds = createSeedDataSource();
 
   await ds.initialize();
-  console.log("✓ Conectado a la base de datos");
+  if (!usePostgres()) {
+    await ensureProtegidoColumn(ds);
+  }
+  console.log(`✓ Conectado (${usePostgres() ? "PostgreSQL" : "SQLite"})`);
 
-  // Eliminar usuario legacy si existe
-  await ds.query("DELETE FROM users WHERE email = ?", ["admin@sanjorge.com"]);
+  const userRepo = ds.getRepository(User);
 
-  // Solo crear usuario admin si no existe
-  const existing = await ds.query(
-    "SELECT id FROM users WHERE email = ?",
-    ["sanjorgeinf@hotmail.com"]
-  );
+  await userRepo.delete({ email: "admin@sanjorge.com" });
 
-  if (existing.length > 0) {
+  const existing = await userRepo.findOne({
+    where: { email: "sanjorgeinf@hotmail.com" },
+  });
+
+  if (existing) {
     console.log("✓ Usuario admin ya existe (email: sanjorgeinf@hotmail.com)");
   } else {
     const pass = await bcrypt.hash("Academia01", 10);
-    await ds.query(
-      "INSERT INTO users (nombre, email, password, rol, activo) VALUES (?, ?, ?, ?, ?)",
-      ["Administrador", "sanjorgeinf@hotmail.com", pass, "admin", 1]
+    await userRepo.save(
+      userRepo.create({
+        nombre: "Administrador",
+        email: "sanjorgeinf@hotmail.com",
+        password: pass,
+        rol: "admin",
+        activo: true,
+      })
     );
     console.log("✓ Usuario admin creado (email: sanjorgeinf@hotmail.com / pass: Academia01)");
   }

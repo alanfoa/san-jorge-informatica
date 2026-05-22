@@ -10,21 +10,12 @@ import { UploadModule } from "./modules/upload/upload.module.js";
 import { MercadoPagoModule } from "./modules/mercadopago/mercadopago.module.js";
 import { HealthModule } from "./modules/health/health.module.js";
 import { CloudinaryModule } from "./cloudinary/cloudinary.module.js";
-import { join } from "path";
-import { fileURLToPath } from "url";
-
-const __dirname = fileURLToPath(new URL(".", import.meta.url));
+import { getTypeOrmModuleOptions } from "./database/typeorm.config.js";
 
 @Module({
   imports: [
     ConfigModule.forRoot({ isGlobal: true }),
-    TypeOrmModule.forRoot({
-      type: "sqljs",
-      location: join(__dirname, "..", "data.db"),
-      autoSave: true,
-      autoLoadEntities: true,
-      synchronize: false,
-    }),
+    TypeOrmModule.forRoot(getTypeOrmModuleOptions()),
     ThrottlerModule.forRoot([
       {
         ttl: 60000,

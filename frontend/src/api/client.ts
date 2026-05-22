@@ -91,8 +91,12 @@ export const api = {
     })
   },
 
+  getMercadoPagoStatus() {
+    return request<{ configured: boolean; testMode: boolean }>('/mercadopago/status')
+  },
+
   createMercadoPagoPreference(items: { title: string; quantity: number; unit_price: number }[]) {
-    return request<{ id: string; init_point: string; sandbox_init_point: string | null }>('/mercadopago/create-preference', {
+    return request<{ id: string; init_point: string; test_mode: boolean }>('/mercadopago/create-preference', {
       method: 'POST',
       body: JSON.stringify({ items }),
     })

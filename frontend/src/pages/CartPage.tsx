@@ -1,6 +1,7 @@
-import { useState } from 'react'
+import { useState, useEffect, useMemo } from 'react'
 import { Link } from 'react-router-dom'
 import { useCart } from '@/hooks/useCart'
+import { useToast } from '@/hooks/useToast'
 import { WHATSAPP } from '@/lib/constants'
 import { sanitizarNombre } from '@/lib/sanitize'
 import { api } from '@/api/client'
@@ -8,23 +9,41 @@ import { ShoppingCart, Trash2, Plus, Minus, ArrowLeft, MessageCircle, CreditCard
 
 export function CartPage() {
   const { items, removeItem, updateQuantity, clearCart, totalItems } = useCart()
+  const { toast } = useToast()
   const [pagando, setPagando] = useState(false)
+  const [mpDisponible, setMpDisponible] = useState(false)
 
-  const itemsConPrecio = items.filter(i => i.producto.precio > 0)
+  const itemsConPrecio = useMemo(
+    () => items.filter(i => Number(i.producto.precio) > 0),
+    [items]
+  )
+
+  const totalMp = useMemo(
+    () => itemsConPrecio.reduce((s, i) => s + Number(i.producto.precio) * i.cantidad, 0),
+    [itemsConPrecio]
+  )
+
+  useEffect(() => {
+    api.getMercadoPagoStatus()
+      .then(s => setMpDisponible(s.configured))
+      .catch(() => setMpDisponible(false))
+  }, [])
 
   async function pagarMercadoPago() {
+    if (itemsConPrecio.length === 0) return
     setPagando(true)
     try {
       const res = await api.createMercadoPagoPreference(
         itemsConPrecio.map(i => ({
           title: sanitizarNombre(i.producto.nombre),
           quantity: i.cantidad,
-          unit_price: i.producto.precio,
+          unit_price: Number(i.producto.precio),
         }))
       )
-      window.open(res.init_point, '_blank')
-    } catch (e: any) {
-      alert(e.message)
+      window.location.href = res.init_point
+    } catch (e: unknown) {
+      const msg = e instanceof Error ? e.message : 'Error al iniciar el pago'
+      toast('error', msg)
     } finally {
       setPagando(false)
     }
@@ -34,13 +53,13 @@ export function CartPage() {
     const lines = items.map(
       (item, i) => {
         const base = `${i + 1}. ${sanitizarNombre(item.producto.nombre)} (x${item.cantidad})`
-        if (item.producto.precio > 0) {
-          return `${base} — $${(item.producto.precio * item.cantidad).toLocaleString('es-AR')}`
+        if (Number(item.producto.precio) > 0) {
+          return `${base} — $${(Number(item.producto.precio) * item.cantidad).toLocaleString('es-AR')}`
         }
         return base
       }
     )
-    const total = items.reduce((s, i) => s + (i.producto.precio > 0 ? i.producto.precio * i.cantidad : 0), 0)
+    const total = items.reduce((s, i) => s + (Number(i.producto.precio) > 0 ? Number(i.producto.precio) * i.cantidad : 0), 0)
     const totalLine = total > 0 ? `\n\nTotal: $${total.toLocaleString('es-AR')}` : ''
     return encodeURIComponent(
       `¡Hola! Quiero consultar por este pedido:\n\n${lines.join('\n')}${totalLine}`
@@ -65,6 +84,8 @@ export function CartPage() {
       </div>
     )
   }
+
+  const mostrarMp = mpDisponible && itemsConPrecio.length > 0
 
   return (
     <div className="min-h-screen bg-black pt-20">
@@ -108,9 +129,9 @@ export function CartPage() {
                 <Link to={`/productos/${item.producto.id}`} className="text-white font-medium hover:text-cyan-400 transition-colors line-clamp-1">
                   {sanitizarNombre(item.producto.nombre)}
                 </Link>
-                {item.producto.precio > 0 && (
+                {Number(item.producto.precio) > 0 && (
                   <p className="text-cyan-400 text-sm font-bold mt-1">
-                    ${item.producto.precio.toLocaleString('es-AR')}
+                    ${Number(item.producto.precio).toLocaleString('es-AR')}
                   </p>
                 )}
               </div>
@@ -142,7 +163,13 @@ export function CartPage() {
         </div>
 
         <div className="bg-gradient-to-r from-cyan-500/10 to-purple-500/10 border border-cyan-500/20 rounded-2xl p-6 text-center">
-          <p className="text-gray-400 mb-4">Los precios y disponibilidad se confirmarán al enviar la consulta</p>
+          {mostrarMp ? (
+            <p className="text-cyan-300 font-semibold text-lg mb-4">
+              Total a pagar: ${totalMp.toLocaleString('es-AR')}
+            </p>
+          ) : (
+            <p className="text-gray-400 mb-4">Los precios y disponibilidad se confirmarán al enviar la consulta</p>
+          )}
           <div className="flex flex-col sm:flex-row gap-4 justify-center">
             <a
               href={`https://wa.me/${WHATSAPP}?text=${whatsappText()}`}
@@ -153,7 +180,7 @@ export function CartPage() {
               <MessageCircle className="w-6 h-6" />
               Consultar por WhatsApp
             </a>
-            {itemsConPrecio.length > 0 && (
+            {mostrarMp && (
               <button
                 onClick={pagarMercadoPago}
                 disabled={pagando}

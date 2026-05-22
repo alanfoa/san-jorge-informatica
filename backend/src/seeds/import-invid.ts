@@ -1,5 +1,5 @@
 import "reflect-metadata";
-import { DataSource } from "typeorm";
+import "dotenv/config";
 import { join } from "path";
 import { fileURLToPath } from "url";
 import { readFileSync, existsSync } from "fs";
@@ -9,6 +9,9 @@ import {
   ProductoImagen,
   Caracteristica,
 } from "../modules/productos/entities/producto.entity.js";
+import { createSyncDataSource } from "../database/create-data-source.js";
+import { usePostgres } from "../database/typeorm.config.js";
+import { ensureProtegidoColumn } from "./ensure-schema.js";
 
 const __dirname = fileURLToPath(new URL(".", import.meta.url));
 const JSON_PATH = join(__dirname, "..", "..", "seeds", "seed-invid.json");
@@ -78,17 +81,14 @@ async function main() {
 
   console.log(`Productos en JSON: ${productos.length}`);
 
-  // Conectar a la BD
-  const ds = new DataSource({
-    type: "sqljs",
-    location: join(__dirname, "..", "..", "data.db"),
-    autoSave: true,
-    synchronize: false,
-    entities: [Categoria, Producto, ProductoImagen, Caracteristica],
-  });
+  const ds = createSyncDataSource([Categoria, Producto, ProductoImagen, Caracteristica]);
 
   await ds.initialize();
-  console.log("✓ Conectado a la base de datos");
+  if (!usePostgres()) {
+    await ensureProtegidoColumn(ds);
+  }
+  console.log(`✓ Conectado (${usePostgres() ? "PostgreSQL" : "SQLite"})`);
+  console.log("  Modo sync: no destructivo (respeta productos protegidos y ediciones del admin)");
 
   // ── 0. Limpiar Caracteristicas internas viejas (SKU y URL Origen) ──
   const deleteResult = await ds
@@ -168,22 +168,14 @@ async function main() {
       : await prodRepo.findOne({ where: { nombre: nombreSanitizado } });
 
     if (existing) {
-      // Actualizar si hay cambios
+      if (existing.protegido || !existing.sku) {
+        skipped++;
+        continue;
+      }
+
       let changed = false;
       if (p.imagen && existing.imagen !== p.imagen) {
         existing.imagen = p.imagen;
-        changed = true;
-      }
-      if (p.precio && existing.precio !== p.precio) {
-        existing.precio = p.precio;
-        changed = true;
-      }
-      if (existing.nombre !== nombreSanitizado) {
-        existing.nombre = nombreSanitizado;
-        changed = true;
-      }
-      if (existing.descripcion !== descripcionSanitizada) {
-        existing.descripcion = descripcionSanitizada;
         changed = true;
       }
       if (changed) {
@@ -195,15 +187,16 @@ async function main() {
       continue;
     }
 
-    // Crear nuevo producto
     const prod = prodRepo.create({
       nombre: nombreSanitizado,
       descripcion: descripcionSanitizada,
+      sku: p.sku || null,
       precio: p.precio || 0,
       imagen: p.imagen || "",
       activo: true,
       destacado: false,
       stock: 0,
+      protegido: false,
       categoriaId: catId,
     });
 

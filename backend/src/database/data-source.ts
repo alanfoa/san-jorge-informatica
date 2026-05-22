@@ -1,17 +1,37 @@
-import { DataSource } from "typeorm";
+import "dotenv/config";
+import { DataSource, type DataSourceOptions } from "typeorm";
 import { join } from "path";
 import { fileURLToPath } from "url";
+import { usePostgres, postgresSsl } from "./typeorm.config.js";
 
 const __dirname = fileURLToPath(new URL(".", import.meta.url));
 
-export const AppDataSource = new DataSource({
-  type: "sqljs",
-  location: join(__dirname, "..", "..", "data.db"),
-  autoSave: true,
-  entities: [join(__dirname, "..", "**", "*.entity.{ts,js}")],
-  migrations: [join(__dirname, "..", "migrations", "*.{ts,js}")],
-  synchronize: false,
-});
+function cliDataSourceOptions(): DataSourceOptions {
+  const entities = [join(__dirname, "..", "**", "*.entity.{ts,js}")];
+  const migrations = [join(__dirname, "..", "migrations", "*.{ts,js}")];
+
+  if (usePostgres()) {
+    return {
+      type: "postgres",
+      url: process.env.DATABASE_URL,
+      ssl: postgresSsl(),
+      synchronize: false,
+      entities,
+      migrations,
+    };
+  }
+
+  return {
+    type: "sqljs",
+    location: join(__dirname, "..", "..", "data.db"),
+    autoSave: true,
+    synchronize: false,
+    entities,
+    migrations,
+  };
+}
+
+export const AppDataSource = new DataSource(cliDataSourceOptions());
 
 const action = process.argv[2];
 if (action) {
@@ -26,10 +46,11 @@ if (action) {
           await AppDataSource.undoLastMigration();
           console.log("✓ Última migración revertida");
           break;
-        case "show":
+        case "show": {
           const pending = await AppDataSource.showMigrations();
           console.log(`Migraciones pendientes: ${pending}`);
           break;
+        }
         case "generate":
           await AppDataSource.runMigrations();
           console.log("✓ Migraciones generadas");

@@ -5,7 +5,7 @@ services:
     region: frankfurt
     plan: free
     buildCommand: cd backend && npm install --include=dev && npm run build
-    startCommand: cd backend && npm run seed:prod && npm run sync:prod && npm run start:prod
+    startCommand: cd backend && npm run seed:prod && npm run start:prod
     envVars:
       - key: NODE_ENV
         value: production
@@ -14,4 +14,8 @@ services:
       - key: PORT
         value: 10000
       - key: CORS_ORIGIN
+        sync: false
+      - key: MERCADOPAGO_ACCESS_TOKEN
+        sync: false
+      - key: DATABASE_URL
         sync: false
