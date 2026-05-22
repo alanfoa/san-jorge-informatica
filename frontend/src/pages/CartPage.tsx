@@ -70,10 +70,10 @@ export function CartPage() {
   if (items.length === 0) {
     return (
       <div className="min-h-screen bg-black pt-20">
-        <div className="max-w-4xl mx-auto px-4 sm:px-6 lg:px-8 py-20 text-center">
-          <ShoppingCart className="w-20 h-20 text-gray-600 mx-auto mb-6" />
-          <h1 className="text-3xl font-bold text-white mb-4">Tu carrito está vacío</h1>
-          <p className="text-gray-400 mb-8">Agregá productos desde nuestro catálogo</p>
+        <div className="max-w-4xl mx-auto px-4 sm:px-6 lg:px-8 py-16 sm:py-20 text-center">
+          <ShoppingCart className="w-16 h-16 sm:w-20 sm:h-20 text-gray-600 mx-auto mb-4 sm:mb-6" />
+          <h1 className="text-2xl sm:text-3xl font-bold text-white mb-3 sm:mb-4">Tu carrito está vacío</h1>
+          <p className="text-sm sm:text-base text-gray-400 mb-6 sm:mb-8">Agregá productos desde nuestro catálogo</p>
           <Link
             to="/productos"
             className="inline-flex items-center gap-2 px-6 py-3 bg-gradient-to-r from-cyan-500 to-purple-600 text-white rounded-xl font-medium shadow-lg hover:shadow-cyan-500/50 transition-all"
@@ -91,23 +91,23 @@ export function CartPage() {
   return (
     <div className="min-h-screen bg-black pt-20">
       <div className="max-w-4xl mx-auto px-4 sm:px-6 lg:px-8 py-12">
-        <div className="flex items-center justify-between mb-8">
+        <div className="flex flex-col sm:flex-row sm:items-center sm:justify-between gap-4 mb-8">
           <div>
             <Link to="/productos" className="inline-flex items-center gap-2 text-gray-400 hover:text-cyan-400 transition-colors mb-4">
               <ArrowLeft className="w-4 h-4" />
               Seguir comprando
             </Link>
-            <h1 className="text-3xl font-bold text-white flex items-center gap-3">
-              <ShoppingCart className="w-8 h-8 text-cyan-400" />
+            <h1 className="text-2xl sm:text-3xl font-bold text-white flex items-center gap-2 sm:gap-3">
+              <ShoppingCart className="w-6 h-6 sm:w-8 sm:h-8 text-cyan-400" />
               Carrito
-              <span className="text-lg text-gray-400 font-normal">({totalItems} productos)</span>
+              <span className="text-sm sm:text-lg text-gray-400 font-normal">({totalItems} productos)</span>
             </h1>
           </div>
           <button
             onClick={clearCart}
-            className="flex items-center gap-2 px-5 py-2.5 text-sm font-semibold text-red-400 border border-red-500/30 hover:text-white hover:bg-red-600 hover:border-red-600 rounded-xl transition-all shadow-lg shadow-red-600/10 hover:shadow-red-600/30"
+            className="self-start sm:self-auto flex items-center gap-2 px-4 sm:px-5 py-2 sm:py-2.5 text-xs sm:text-sm font-semibold text-red-400 border border-red-500/30 hover:text-white hover:bg-red-600 hover:border-red-600 rounded-xl transition-all shadow-lg shadow-red-600/10 hover:shadow-red-600/30"
           >
-            <Trash2 className="w-4 h-4" />
+            <Trash2 className="w-3.5 h-3.5 sm:w-4 sm:h-4" />
             Vaciar carrito
           </button>
         </div>
@@ -116,49 +116,60 @@ export function CartPage() {
           {items.map((item) => (
             <div
               key={item.producto.id}
-              className="flex items-center gap-4 bg-gray-900/50 backdrop-blur-sm rounded-xl border border-cyan-500/20 p-4"
+              className="flex flex-col sm:flex-row sm:items-center gap-4 bg-gray-900/50 backdrop-blur-sm rounded-xl border border-cyan-500/20 p-4"
             >
-              <Link to={`/productos/${item.producto.id}`} className="w-20 h-20 rounded-lg overflow-hidden bg-gray-800 flex-shrink-0">
-                {item.producto.imagen ? (
-                  <img src={item.producto.imagen} alt={sanitizarNombre(item.producto.nombre)} className="w-full h-full object-cover" />
-                ) : (
-                  <div className="w-full h-full flex items-center justify-center text-gray-600 text-xs">Sin img</div>
-                )}
-              </Link>
-
-              <div className="flex-1 min-w-0">
-                <Link to={`/productos/${item.producto.id}`} className="text-white font-medium hover:text-cyan-400 transition-colors line-clamp-1">
-                  {sanitizarNombre(item.producto.nombre)}
+              <div className="flex items-center gap-4 flex-1 min-w-0 overflow-hidden">
+                <Link to={`/productos/${item.producto.id}`} className="w-20 h-20 rounded-lg overflow-hidden bg-gray-800 flex-shrink-0">
+                  {item.producto.imagen ? (
+                    <img src={item.producto.imagen} alt={sanitizarNombre(item.producto.nombre)} className="w-full h-full object-cover" />
+                  ) : (
+                    <div className="w-full h-full flex items-center justify-center text-gray-600 text-xs">Sin img</div>
+                  )}
                 </Link>
-                {Number(item.producto.precio) > 0 && (
-                  <p className="text-cyan-400 text-sm font-bold mt-1">
-                    ${formatPrice(Number(item.producto.precio) * item.cantidad)}
-                  </p>
-                )}
-              </div>
 
-              <div className="flex items-center gap-2">
+                <div className="flex-1 min-w-0 overflow-hidden">
+                  <Link to={`/productos/${item.producto.id}`} className="text-white font-medium hover:text-cyan-400 transition-colors line-clamp-1">
+                    {sanitizarNombre(item.producto.nombre)}
+                  </Link>
+                  {Number(item.producto.precio) > 0 && (
+                    <p className="text-cyan-400 text-sm font-bold mt-1 truncate">
+                      ${formatPrice(Number(item.producto.precio) * item.cantidad)}
+                    </p>
+                  )}
+                </div>
+
                 <button
-                  onClick={() => updateQuantity(item.producto.id, item.cantidad - 1)}
-                  className="w-8 h-8 rounded-lg bg-gray-800 text-gray-400 hover:text-white hover:bg-gray-700 transition-all flex items-center justify-center"
+                  onClick={() => removeItem(item.producto.id)}
+                  className="sm:hidden p-2 text-gray-500 hover:text-red-400 hover:bg-red-500/10 rounded-lg transition-all"
                 >
-                  <Minus className="w-4 h-4" />
-                </button>
-                <span className="w-8 text-center text-white font-medium">{item.cantidad}</span>
-                <button
-                  onClick={() => updateQuantity(item.producto.id, item.cantidad + 1)}
-                  className="w-8 h-8 rounded-lg bg-gray-800 text-gray-400 hover:text-white hover:bg-gray-700 transition-all flex items-center justify-center"
-                >
-                  <Plus className="w-4 h-4" />
+                  <Trash2 className="w-5 h-5" />
                 </button>
               </div>
 
-              <button
-                onClick={() => removeItem(item.producto.id)}
-                className="p-2 text-gray-500 hover:text-red-400 hover:bg-red-500/10 rounded-lg transition-all"
-              >
-                <Trash2 className="w-5 h-5" />
-              </button>
+              <div className="flex items-center justify-between sm:justify-end gap-4">
+                <div className="flex items-center gap-2">
+                  <button
+                    onClick={() => updateQuantity(item.producto.id, item.cantidad - 1)}
+                    className="w-8 h-8 rounded-lg bg-gray-800 text-gray-400 hover:text-white hover:bg-gray-700 transition-all flex items-center justify-center"
+                  >
+                    <Minus className="w-4 h-4" />
+                  </button>
+                  <span className="w-8 text-center text-white font-medium">{item.cantidad}</span>
+                  <button
+                    onClick={() => updateQuantity(item.producto.id, item.cantidad + 1)}
+                    className="w-8 h-8 rounded-lg bg-gray-800 text-gray-400 hover:text-white hover:bg-gray-700 transition-all flex items-center justify-center"
+                  >
+                    <Plus className="w-4 h-4" />
+                  </button>
+                </div>
+
+                <button
+                  onClick={() => removeItem(item.producto.id)}
+                  className="hidden sm:block p-2 text-gray-500 hover:text-red-400 hover:bg-red-500/10 rounded-lg transition-all"
+                >
+                  <Trash2 className="w-5 h-5" />
+                </button>
+              </div>
             </div>
           ))}
         </div>
@@ -171,26 +182,26 @@ export function CartPage() {
           ) : (
             <p className="text-gray-400 mb-4">Los precios y disponibilidad se confirmarán al enviar la consulta</p>
           )}
-          <div className="flex flex-col sm:flex-row gap-4 justify-center">
+          <div className="flex flex-col sm:flex-row gap-3 sm:gap-4 justify-center">
             <a
               href={`https://wa.me/${WHATSAPP}?text=${whatsappText()}`}
               target="_blank"
               rel="noopener noreferrer"
-              className="inline-flex items-center gap-3 px-8 py-4 bg-gradient-to-r from-green-600 to-green-700 hover:from-green-500 hover:to-green-600 text-white rounded-xl font-bold text-lg shadow-xl shadow-green-600/50 hover:shadow-green-600/70 hover:scale-105 transition-all"
+              className="inline-flex items-center justify-center gap-2 sm:gap-3 px-6 sm:px-8 py-3 sm:py-4 bg-gradient-to-r from-green-600 to-green-700 hover:from-green-500 hover:to-green-600 text-white rounded-xl font-bold text-base sm:text-lg shadow-xl shadow-green-600/50 hover:shadow-green-600/70 hover:scale-105 transition-all"
             >
-              <MessageCircle className="w-6 h-6" />
+              <MessageCircle className="w-5 h-5 sm:w-6 sm:h-6" />
               Consultar por WhatsApp
             </a>
             {mostrarMp && (
               <button
                 onClick={pagarMercadoPago}
                 disabled={pagando}
-                className="inline-flex items-center gap-3 px-8 py-4 bg-gradient-to-r from-blue-600 to-cyan-600 hover:from-blue-500 hover:to-cyan-500 text-white rounded-xl font-bold text-lg shadow-xl shadow-blue-600/50 hover:shadow-blue-600/70 hover:scale-105 transition-all disabled:opacity-50 disabled:cursor-not-allowed"
+                className="inline-flex items-center justify-center gap-2 sm:gap-3 px-6 sm:px-8 py-3 sm:py-4 bg-gradient-to-r from-blue-600 to-cyan-600 hover:from-blue-500 hover:to-cyan-500 text-white rounded-xl font-bold text-base sm:text-lg shadow-xl shadow-blue-600/50 hover:shadow-blue-600/70 hover:scale-105 transition-all disabled:opacity-50 disabled:cursor-not-allowed"
               >
                 {pagando ? (
-                  <Loader2 className="w-6 h-6 animate-spin" />
+                  <Loader2 className="w-5 h-5 sm:w-6 sm:h-6 animate-spin" />
                 ) : (
-                  <CreditCard className="w-6 h-6" />
+                  <CreditCard className="w-5 h-5 sm:w-6 sm:h-6" />
                 )}
                 Pagar con Mercado Pago
               </button>
