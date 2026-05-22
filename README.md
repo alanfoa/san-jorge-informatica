@@ -12,7 +12,7 @@ E-commerce completo para San Jorge Informática, tienda de insumos informáticos
 - Carrito de compras con cálculo de total
 - Checkout con Mercado Pago
 ### Panel de administración
-- **Sincronización Invid:** un botón para scrapear e importar todo el catálogo desde Invid
+- **Sincronización web externa:** un botón para scrapear e importar todo el catálogo desde web externa
 - Productos: crear, editar, activar/desactivar, subir imágenes
 - Categorías: gestionar categorías
 - Usuarios: login seguro con JWT + rate limiting
