@@ -116,4 +116,11 @@ export const api = {
     }
     return res.json() as Promise<{ url: string }>
   },
+
+  syncInvid(token: string) {
+    return request<{ created: number; updated: number; skipped: number; scraped: number; message: string; duration: string }>('/admin/sync-invid', {
+      method: 'POST',
+      headers: authHeaders(token),
+    })
+  },
 }

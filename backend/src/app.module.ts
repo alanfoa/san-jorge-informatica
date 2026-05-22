@@ -9,6 +9,7 @@ import { ProductosModule } from "./modules/productos/productos.module.js";
 import { UploadModule } from "./modules/upload/upload.module.js";
 import { MercadoPagoModule } from "./modules/mercadopago/mercadopago.module.js";
 import { HealthModule } from "./modules/health/health.module.js";
+import { AdminModule } from "./modules/admin/admin.module.js";
 import { CloudinaryModule } from "./cloudinary/cloudinary.module.js";
 import { getTypeOrmModuleOptions } from "./database/typeorm.config.js";
 
@@ -24,6 +25,7 @@ import { getTypeOrmModuleOptions } from "./database/typeorm.config.js";
     ]),
     CloudinaryModule,
     MercadoPagoModule,
+    AdminModule,
     HealthModule,
     AuthModule,
     UsersModule,

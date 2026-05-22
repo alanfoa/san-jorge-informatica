@@ -1,12 +1,16 @@
+import { useState } from 'react'
 import { useNavigate, Link, useSearchParams } from 'react-router-dom'
 import { TableSkeleton } from '@/components/TableSkeleton'
 import { useProductos, useDeleteProducto } from '@/hooks/queries'
 import { useToast } from '@/hooks/useToast'
+import { api } from '@/api/client'
+import { Loader2, RefreshCw } from 'lucide-react'
 
 export function AdminPage() {
   const navigate = useNavigate()
   const [searchParams] = useSearchParams()
   const { toast } = useToast()
+  const [syncing, setSyncing] = useState(false)
   const token = localStorage.getItem('admin_token') || sessionStorage.getItem('admin_token')
   const { data: allProductos = [], isLoading } = useProductos()
   const categoriaFiltro = searchParams.get('categoriaId')
@@ -31,6 +35,21 @@ export function AdminPage() {
     }
   }
 
+  async function handleSyncInvid() {
+    if (!token) return
+    setSyncing(true)
+    try {
+      const res = await api.syncInvid(token)
+      toast('success', `Invid: ${res.created} creados, ${res.updated} act., ${res.skipped} omitidos (${res.duration})`)
+      window.location.reload()
+    } catch (e: unknown) {
+      const msg = e instanceof Error ? e.message : 'Error al sincronizar'
+      toast('error', msg)
+    } finally {
+      setSyncing(false)
+    }
+  }
+
   function handleLogout() {
     localStorage.removeItem('admin_token')
     sessionStorage.removeItem('admin_token')
@@ -52,6 +71,14 @@ export function AdminPage() {
           <div className="flex gap-3">
             <Link to="/admin/categorias" className="px-4 py-2 bg-gray-800 text-white rounded-lg text-sm font-medium hover:bg-gray-700 transition-all">Categorías</Link>
             <Link to="/admin/nuevo" className="px-4 py-2 bg-gradient-to-r from-cyan-500 to-purple-600 text-white rounded-lg text-sm font-medium shadow-lg shadow-cyan-500/50 hover:shadow-cyan-500/80 transition-all">Nuevo producto</Link>
+            <button
+              onClick={handleSyncInvid}
+              disabled={syncing}
+              className="flex items-center gap-2 px-4 py-2 bg-gray-800 text-white rounded-lg text-sm font-medium hover:bg-gray-700 transition-all disabled:opacity-50"
+            >
+              {syncing ? <Loader2 className="w-4 h-4 animate-spin" /> : <RefreshCw className="w-4 h-4" />}
+              {syncing ? 'Sincronizando...' : 'Sinc. Invid'}
+            </button>
             <button onClick={handleLogout} className="text-sm text-gray-400 hover:text-cyan-400 transition-colors">Cerrar sesión</button>
           </div>
         </div>
